@@ -1,0 +1,4 @@
+/home/pi/cripto_ciphers/ciphers/RSA_algorithm.c: In function ‘main’:
+/home/pi/cripto_ciphers/ciphers/RSA_algorithm.c:44:17: warning: comparison between pointer and integer
+   44 |  for (i=0;msg[i]!=NULL;i++)
+      |                 ^~
