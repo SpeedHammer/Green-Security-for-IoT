@@ -4,7 +4,7 @@ LDFLAGS = -lm -lmcrypt
 
 SRC_DIR = $(HOME)/cripto_ciphers/ciphers
 BIN_DIR = $(HOME)/cripto_benchmark_pipeline/bin
-LOG_DIR = $(HOME)/cripto_benchmark_pipeline/logs
+LOG_DIR = $(HOME)/cripto_benchmark_pipeline/compilation_error_logs
 
 CIPHERS = AES_Algorithm caeser_cipher RSA_algorithm xor_cipher \
           base64_cipher  playfair_cipher TripleDES \
