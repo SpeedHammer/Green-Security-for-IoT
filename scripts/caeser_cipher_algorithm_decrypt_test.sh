@@ -4,6 +4,8 @@ cd ~/cripto_benchmark_pipeline/bin
 
 powerjoular -f ~/cripto_benchmark_pipeline/results/caeser_cipher_decrypt_result.txt & PID=$!
 
+sleep 1
+
 for i in $(seq 1 1000);
 do
        echo 2 | ./caeser_cipher
