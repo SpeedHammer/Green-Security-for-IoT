@@ -1,4 +1,4 @@
-/home/pi/cripto_ciphers/ciphers/base64_cipher.c: In function ‘base64Encoder’:
-/home/pi/cripto_ciphers/ciphers/base64_cipher.c:82:15: warning: multi-character character constant [-Wmultichar]
+/home/pi/cripto_benchmark_pipeline/cripto_ciphers/ciphers/base64_cipher.c: In function ‘base64Encoder’:
+/home/pi/cripto_benchmark_pipeline/cripto_ciphers/ciphers/base64_cipher.c:82:15: warning: multi-character character constant [-Wmultichar]
    82 |  res_str[k] = '\0;';
       |               ^~~~~

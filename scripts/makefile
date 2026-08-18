@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -O2
 LDFLAGS = -lm -lmcrypt
 
-SRC_DIR = $(HOME)/cripto_ciphers/ciphers
+SRC_DIR = $(HOME)/cripto_benchmark_pipeline/cripto_ciphers/ciphers
 BIN_DIR = $(HOME)/cripto_benchmark_pipeline/bin
 LOG_DIR = $(HOME)/cripto_benchmark_pipeline/compilation_error_logs
 
