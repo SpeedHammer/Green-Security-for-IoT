@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 
 	scanf("%i",&n);
 	for (int m = n * 1024; m > 0 ; m--){
-		printf("%s", "A");
+		printf("%s", "a");
 		} 
 	printf("\n");
 	return 0;
