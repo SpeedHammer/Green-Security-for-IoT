@@ -10,13 +10,14 @@ rm -f "$OUTPUT"/*
 
 for file in "${INPUTS[@]}"; do
 
-	powerjoular -c -f  $OUTPUT/RSA_$(basename "$file" .txt).csv & PID=$!
+	powerjoular -c -f  "$OUTPUT"/RSA_$(basename "$file" .txt).csv & PID=$!
 	sleep 1
 	for  i in {1..1000}; do
 		(echo 11 &&
 	 	echo 13 &&
-	 	cat ~/cripto_benchmark_pipeline/inputs/$file) | ~/cripto_benchmark_pipeline/bin/RSA_algorithm > /dev/null
+	 	cat ~/cripto_benchmark_pipeline/inputs/"$file") | ~/cripto_benchmark_pipeline/bin/RSA_algorithm > /dev/null
 	done
-	kill $PID
+	kill "$PID"
+	wait "$PID" 2>/dev/null
 	sleep 1
 done
