@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "../../utils/hex_utils.h"
+#include "../utils/hex_utils.h"
 #include "gift128.h"
 
 /* First half of the G(Y) */
@@ -267,17 +267,19 @@ void pad(uint8_t *result, uint8_t *block, uint32_t len)
 	
 int main() 
 {
+	uint8_t message[10240];
+	uint32_t message_len = fread(message, 1, sizeof(message), stdin);
     /*
     test vector count = 34
     */
-    char message_hex[] = "00";
+    //char message_hex[] = "00";
     char key_hex[] =     "000102030405060708090A0B0C0D0E0F";
     char ad_hex[] =      "";
     char nonce_hex[] =   "000102030405060708090A0B0C0D0E0F";
 
     uint8_t *cipher_text;
-    uint8_t *message = hex_to_bytes(message_hex, sizeof(message_hex));
-    uint32_t message_len = sizeof(message_hex) / 2;
+    //uint8_t *message = hex_to_bytes(message_hex, sizeof(message_hex));
+    //uint32_t message_len = sizeof(message_hex) / 2;
     uint8_t *key = hex_to_bytes(key_hex, 32);
     uint8_t *nonce = hex_to_bytes(nonce_hex, 32);
     uint8_t *ad = hex_to_bytes(ad_hex, sizeof(ad_hex));
@@ -289,7 +291,7 @@ int main()
     printf("decrypt----\n");
     decrypt(cipher_text, message_len, key, ad, adlen, nonce);
     free(cipher_text);
-    free(message);
+    //free(message);
     printf("done!\n");
 
     return 0;
