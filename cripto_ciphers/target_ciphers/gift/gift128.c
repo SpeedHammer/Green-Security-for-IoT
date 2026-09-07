@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "../../utils/hex_utils.h"
+#include "../utils/hex_utils.h"
 #include "gift128.h"
 
 #define GIFT128_N_ROUNDS 40
