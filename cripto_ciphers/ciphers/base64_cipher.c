@@ -1,112 +1,146 @@
 /*
-* Base64 cipher
-* Base 64 is an encoding scheme that converts binary data into text format 
-* so that encoded textual data can be easily transported over network 
-* un-corrupted and without any data loss.
-* 
-* @Code by Anvikshajain
-* FIXED: dynamic buffers so any input size works, instead of a fixed-size
-* SIZE=1000 malloc that overflows once output exceeds 1000 bytes (base64
-* output is ~4/3 the input length, so any input over ~750 bytes already
-* overflowed the old buffer).
-*/
-#include <stdio.h> 
-#include <stdlib.h> 
+ * Base64 cipher (encode + decode)
+ *
+ * ALGORITMO: Base64 (RFC 4648) - nao e' criptografia, e' codificacao
+ * (reversivel sem chave, nao fornece confidencialidade nem integridade).
+ * LIMITACOES CONHECIDAS: nao autentica, nao esconde o conteudo (qualquer
+ * um pode decodificar), usado aqui so' como benchmark de custo de
+ * transformacao, nao de seguranca.
+ *
+ * @Code by Anvikshajain (encoder original)
+ * CORRIGIDO:
+ * 1) Buffer de saida fixo (SIZE=1000) trocado por alocacao dinamica
+ *    dimensionada pro tamanho real da entrada (nao ha' limite de
+ *    tamanho de entrada).
+ * 2) Leitura de entrada trocada de scanf/buffer fixo para getline()
+ *    dinamico (qualquer tamanho de mensagem).
+ * 3) Adicionado base64Decoder() - o arquivo original so' tinha encode,
+ *    entao nao era possivel fazer a operacao inversa nem verificar
+ *    round-trip.
+ * 4) Adicionada verificacao automatica: decode(encode(x)) == x, com
+ *    saida clara de "Verification: OK" / "Verification: FAILED".
+ * 5) Checagem de retorno de malloc() em todos os pontos de alocacao.
+ * 6) free() de todos os buffers alocados.
+ *
+ * Compilar:  gcc -O2 -Wall -o base64_cipher base64_cipher.c
+ * Rodar:     echo "hello world" | ./base64_cipher
+ *            cat input_10kB.txt | ./base64_cipher
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-// Takes string to be encoded as input 
-// and its length and returns encoded string (caller must free() it)
-char* base64Encoder(char input_str[], int len_str) 
-{ 
-	// Character set of base64 encoding scheme 
-	char char_set[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; 
-	
-	// Resultant string - sized to fit the actual output for this input,
-	// with generous headroom (ceil(len/3)*4 + padding + null terminator).
-	size_t out_cap = ((size_t)len_str / 3 + 2) * 4 + 1;
-	char *res_str = (char *) malloc(out_cap); 
-	
-	int index, no_of_bits = 0, padding = 0, val = 0, count = 0, temp; 
-	int i, j, k = 0; 
-	
-	// Loop takes 3 characters at a time from 
-	// input_str and stores it in val 
-	for (i = 0; i < len_str; i += 3) 
-		{ 
-			val = 0, count = 0, no_of_bits = 0; 
-			for (j = i; j < len_str && j <= i + 2; j++) 
-			{ 
-				// binary data of input_str is stored in val 
-				val = val << 8; 
-				
-				// (A + 0 = A) stores character in val 
-				val = val | (unsigned char)input_str[j]; 
-				
-				// calculates how many time loop 
-				// ran if "MEN" -> 3 otherwise "ON" -> 2 
-				count++; 
-			
-			} 
-			no_of_bits = count * 8; 
-			// calculates how many "=" to append after res_str. 
-			padding = no_of_bits % 3; 
-			// extracts all bits from val (6 at a time) 
-			// and find the value of each block 
-			while (no_of_bits != 0) 
-			{ 
-				// retrieve the value of each block 
-				if (no_of_bits >= 6) 
-				{ 
-					temp = no_of_bits - 6; 
-					
-					// binary of 63 is (111111) f 
-					index = (val >> temp) & 63; 
-					no_of_bits -= 6;		 
-				} 
-				else
-				{ 
-					temp = 6 - no_of_bits; 
-					
-					// append zeros to right if bits are less than 6 
-					index = (val << temp) & 63; 
-					no_of_bits = 0; 
-				} 
-				res_str[k++] = char_set[index]; 
-			} 
-	} 
-	// padding is done here 
-	for (i = 1; i <= padding; i++) 
-	{ 
-		res_str[k++] = '='; 
-	} 
-	res_str[k] = '\0'; 
-	return res_str; 
-} 
-// Driver code 
-int main() 
-{ 
-	printf("Enter message to encode: ");
+static const char CHAR_SET[] =
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-	// Dynamic input read (getline) so any message size works, matching
-	// the dynamic output buffer above - no fixed cap on either end.
-	char *input_str = NULL;
+// Encodes input_str (len_str bytes, may contain '\0') to base64.
+// Returns a malloc'd, NUL-terminated string the caller must free(),
+// or NULL on allocation failure.
+char *base64Encoder(const unsigned char *input_str, size_t len_str)
+{
+	size_t out_cap = ((len_str + 2) / 3) * 4 + 1;
+	char *res_str = (char *) malloc(out_cap);
+	if (!res_str) return NULL;
+
+	size_t k = 0;
+	for (size_t i = 0; i < len_str; i += 3) {
+		int val = 0, count = 0;
+		for (size_t j = i; j < len_str && j < i + 3; j++) {
+			val = (val << 8) | input_str[j];
+			count++;
+		}
+		int no_of_bits = count * 8;
+		val <<= (3 - count) * 8; // left-align remaining bits
+
+		int groups = (count == 1) ? 2 : (count == 2) ? 3 : 4;
+		for (int g = 0; g < groups; g++) {
+			int shift = 18 - g * 6;
+			int index = (val >> shift) & 63;
+			res_str[k++] = CHAR_SET[index];
+		}
+		for (int p = groups; p < 4; p++) res_str[k++] = '=';
+		(void)no_of_bits;
+	}
+	res_str[k] = '\0';
+	return res_str;
+}
+
+// Decodes a base64 string back to raw bytes. Writes the decoded length
+// to *out_len. Returns a malloc'd buffer the caller must free(), or
+// NULL on allocation failure or malformed input.
+unsigned char *base64Decoder(const char *b64, size_t *out_len)
+{
+	size_t in_len = strlen(b64);
+	if (in_len % 4 != 0) return NULL; // malformed base64
+
+	unsigned char *out = (unsigned char *) malloc(in_len / 4 * 3 + 1);
+	if (!out) return NULL;
+
+	size_t k = 0;
+	for (size_t i = 0; i < in_len; i += 4) {
+		int vals[4], pad = 0;
+		for (int j = 0; j < 4; j++) {
+			char c = b64[i + j];
+			if (c == '=') { vals[j] = 0; pad++; }
+			else {
+				const char *p = strchr(CHAR_SET, c);
+				if (!p) { free(out); return NULL; } // invalid char
+				vals[j] = (int)(p - CHAR_SET);
+			}
+		}
+		int triple = (vals[0] << 18) | (vals[1] << 12) | (vals[2] << 6) | vals[3];
+		out[k++] = (triple >> 16) & 0xFF;
+		if (pad < 2) out[k++] = (triple >> 8) & 0xFF;
+		if (pad < 1) out[k++] = triple & 0xFF;
+	}
+	out[k] = '\0';
+	*out_len = k;
+	return out;
+}
+
+int main(void)
+{
+	// --- I/O: fora da regiao medida no benchmark ---
+	char *line = NULL;
 	size_t cap = 0;
-	ssize_t nread = getline(&input_str, &cap, stdin);
+	ssize_t nread = getline(&line, &cap, stdin);
 	if (nread < 0) {
 		fprintf(stderr, "Failed to read input.\n");
+		free(line);
 		return 1;
 	}
-	if (nread > 0 && input_str[nread - 1] == '\n') {
-		input_str[nread - 1] = '\0';
-		nread--;
+	if (nread > 0 && line[nread - 1] == '\n') { line[nread - 1] = '\0'; nread--; }
+
+	printf("Input: %s\n", line);
+
+	// --- OPERACAO CRIPTOGRAFICA (regiao a medir no benchmark) ---
+	char *encoded = base64Encoder((unsigned char *)line, (size_t)nread);
+	if (!encoded) {
+		fprintf(stderr, "Encode allocation failed.\n");
+		free(line);
+		return 1;
 	}
-	int len_str = (int)nread;
 
-	printf("Input string is : %s\n", input_str); 
-	char *encoded = base64Encoder(input_str, len_str);
-	printf("Encoded string is : %s\n", encoded); 
+	size_t decoded_len = 0;
+	unsigned char *decoded = base64Decoder(encoded, &decoded_len);
+	// --- fim da regiao medida ---
 
-	free(input_str);
+	if (!decoded) {
+		fprintf(stderr, "Decode failed (allocation or malformed base64).\n");
+		free(line); free(encoded);
+		return 1;
+	}
+
+	printf("Output: %s\n", encoded);
+	printf("Recovered: %s\n", decoded);
+
+	int ok = (decoded_len == (size_t)nread) &&
+	         (memcmp(decoded, line, (size_t)nread) == 0);
+	printf("Verification: %s\n", ok ? "OK" : "FAILED");
+
+	free(line);
 	free(encoded);
-	return 0; 
+	free(decoded);
+	return ok ? 0 : 1;
 }
