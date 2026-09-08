@@ -75,7 +75,7 @@ void elephat_aead(uint8_t *output, uint8_t *tag, uint8_t *message, uint32_t mess
     
     //printf("init tag: %s\n", bytes_to_hex(tag, 20));
      printf("n_c_blocks: %d, n_ad_blocks: %d\n", data.n_c_blocks, data.n_ad_blocks); 
-    for (i = 0; i < data.n_c_blocks + 1 || i < data.n_ad_blocks - 1; i++)
+    for (i = 0; i < data.n_c_blocks + 1 && i < data.n_ad_blocks - 1; i++)
     {
 	printf("i: %d\n", i);
 	update_lfsr(data.next_mask, data.current_mask);
@@ -132,7 +132,7 @@ void process_message_block(uint8_t *cipher_text_block, Elephant_data *data, uint
     mask_i_minus_1_1(buffer, data);
     permute(buffer);
     mask_i_minus_1_1(buffer, data);
-    xor_block_partial(cipher_text_block, buffer, data->message + i, data->message_len - i * BLOCK_SIZE); 
+    xor_block_partial(cipher_text_block + i *  BLOCK_SIZE, buffer, data->message + i * BLOCK_SIZE, (data->message_len - i * BLOCK_SIZE) < BLOCK_SIZE ? (data->message_len - i * BLOCK_SIZE) : BLOCK_SIZE); 
 }
 
 void mask_i_minus_1_1(uint8_t *buffer, Elephant_data *data)
@@ -258,6 +258,7 @@ int main()
     uint8_t tag[20];
 
     for(int i = 0; i<1000; i++){
+         printf("%i\n",i);
         encrypt(cipher_text, tag, message, message_len, key, ad, adlen, nonce); 
     };
 
