@@ -182,7 +182,7 @@ void process_cipher_text(uint8_t *plain_text, Ascon_data *data)
     uint64_t ci, temp;
     uint32_t n_message_blocks, i;
     uint8_t last_block_size, *last_block;
-    n_message_blocks = data->message_len / BLOCK_SIZE + (data->message_len % BLOCK_SIZE > 0);
+    n_message_blocks = data->message_len / BLOCK_SIZE + 1);
     printf("n_message_blocks: %d\n", n_message_blocks);
     for (i = 0; i < n_message_blocks - 1; i++)
     {
