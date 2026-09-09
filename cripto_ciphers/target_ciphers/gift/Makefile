@@ -1,5 +1,11 @@
-gift: gift_coft.c ../../utils/hex_utils.c 
-	gcc -o gift gift_coft.c ../../utils/hex_utils.c gift128.c
+make: gift_encrypt gift_decrypt
+
+gift_encrypt: gift_coft_encrypt.c ../utils/hex_utils.c 
+	gcc -O2 -o gift_encrypt gift_coft_encrypt.c ../utils/hex_utils.c gift128.c
+
+gift_decrypt: gift_coft_decrypt.c ../utils/hex_utils.c 
+	gcc -O2 -o gift_decrypt gift_coft_decrypt.c ../utils/hex_utils.c gift128.c
+
 
 clean: 
-	rm gift.exe
+	rm gift_encrypt gift_decrypt

@@ -176,7 +176,7 @@ uint8_t *decrypt(uint8_t *cipher_text, uint64_t cipher_text_len, uint8_t *key, u
     
 void process_cipher_text(uint8_t *plain_text, uint64_t *y, uint64_t *x, uint8_t *cipher_text, uint64_t cipher_text_len, uint8_t *key, uint64_t *L, uint32_t a, uint32_t m)
 {
-    printf("process_plain_text\n");
+   // printf("process_plain_text\n");
     uint32_t i;
     uint64_t last_block[2];
     if (cipher_text_len == 0) return;
@@ -191,9 +191,9 @@ void process_cipher_text(uint8_t *plain_text, uint64_t *y, uint64_t *x, uint8_t 
 	triple_half_block((uint8_t*)L, (uint8_t*)L);
 
     pad((uint8_t*)last_block, cipher_text, cipher_text_len);
-    printf("pad (PT): %s\n", bytes_to_hex((uint8_t*)last_block, 16));
+    //printf("pad (PT): %s\n", bytes_to_hex((uint8_t*)last_block, 16));
     process_last_cipher_text_block(plain_text, y, x, last_block, key, (m - 1) << 1, L, a, cipher_text_len);
-    printf("process cipher text done\n");
+    //printf("process cipher text done\n");
 }
 
 void process_cipher_text_block(uint8_t *plain_text, uint64_t *y, uint64_t *x, uint64_t *cipher_text_block, uint8_t *key, uint32_t j, uint64_t *L, uint32_t a)
@@ -284,24 +284,30 @@ int main()
     uint8_t *nonce = hex_to_bytes(nonce_hex, 32);
     uint8_t *ad = hex_to_bytes(ad_hex, sizeof(ad_hex));
     uint32_t adlen = sizeof(ad_hex) / 2;
-
+    uint8_t *plain_text;
     //cipher_text = (uint8_t*)malloc(16);
     //printf("adlen: %d\n", adlen);
 
-    cipher_text = encrypt(message, message_len, key, ad, adlen, nonce); 
-    free(cipher_text);
+    cipher_text = encrypt(message, message_len, key, ad, adlen, nonce);
+    char *hex = bytes_to_hex(cipher_text, message_len); 
+    printf("cipher text: %s\n", hex);
+    free (hex);
 
-    for(int i = 1; i < 1000; i++){
-        encrypt(message, message_len, key, ad, adlen, nonce);
+    printf("decrypt----\n");
+   
+    for(int i = 0; i < 999; i++){
+       plain_text =  decrypt(cipher_text, message_len, key, ad, adlen, nonce);
+       free(plain_text);
     };
 
-    //printf("decrypt----\n");
-    //uint8_t *decrypt = decrypt(cipher_text, message_len, key, ad, adlen, nonce);
+    uint8_t *decryption = decrypt(cipher_text, message_len, key, ad, adlen, nonce);
+    printf("decrypted text: %.*s\n", message_len, decryption);
+    free(decryption);
+
     free(cipher_text);
     free(key);
     free(nonce);
     free(ad);
-    //free(message);
     printf("done!\n");
 
     return 0;
