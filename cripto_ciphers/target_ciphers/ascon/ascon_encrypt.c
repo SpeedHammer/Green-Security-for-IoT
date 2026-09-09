@@ -41,9 +41,9 @@ void encrypt(uint8_t *cipher_text, uint8_t *tag, uint8_t *plain_text, uint32_t p
     Ascon_data data;
     init_data(&data, plain_text, plain_text_len, associated_data, adlen, key, nonce);
     initialize_state(&data);
-    printf("state after init: %s\n", bytes_to_hex((uint8_t*)data.state, STATE_SIZE));
+   // printf("state after init: %s\n", bytes_to_hex((uint8_t*)data.state, STATE_SIZE));
     process_associated_data(&data);
-    printf("state after process ad: %s\n", bytes_to_hex((uint8_t*)data.state, STATE_SIZE));
+   // printf("state after process ad: %s\n", bytes_to_hex((uint8_t*)data.state, STATE_SIZE));
     process_plain_text(cipher_text, &data);
     finalize(tag, &data);
 }
@@ -238,6 +238,9 @@ int main() {
 
     free(cipher_text);
 //    free(plaint_text);
+    free(key);
+    free(nonce);
+    free(ad);
 
     printf("done!\n");
     return 0;

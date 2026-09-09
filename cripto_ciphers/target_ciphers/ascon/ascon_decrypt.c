@@ -41,9 +41,9 @@ void encrypt(uint8_t *cipher_text, uint8_t *tag, uint8_t *plain_text, uint32_t p
     Ascon_data data;
     init_data(&data, plain_text, plain_text_len, associated_data, adlen, key, nonce);
     initialize_state(&data);
-    printf("state after init: %s\n", bytes_to_hex((uint8_t*)data.state, STATE_SIZE));
+   // printf("state after init: %s\n", bytes_to_hex((uint8_t*)data.state, STATE_SIZE));
     process_associated_data(&data);
-    printf("state after process ad: %s\n", bytes_to_hex((uint8_t*)data.state, STATE_SIZE));
+   // printf("state after process ad: %s\n", bytes_to_hex((uint8_t*)data.state, STATE_SIZE));
     process_plain_text(cipher_text, &data);
     finalize(tag, &data);
 }
@@ -183,7 +183,7 @@ void process_cipher_text(uint8_t *plain_text, Ascon_data *data)
     uint32_t n_message_blocks, i;
     uint8_t last_block_size, *last_block;
     n_message_blocks = data->message_len / BLOCK_SIZE + 1;
-    printf("n_message_blocks: %d\n", n_message_blocks);
+   // printf("n_message_blocks: %d\n", n_message_blocks);
     for (i = 0; i < n_message_blocks - 1; i++)
     {
 	load_bytes_output_reversed((uint8_t*)&ci, 0, (uint8_t*)((uint64_t*)data->message + i), BLOCK_SIZE);
@@ -242,6 +242,9 @@ int main() {
 
     free(cipher_text);
     free(plaint_text);
+    free(key);
+    free(nonce);
+    free(ad);
 
     printf("done!\n");
     return 0;
