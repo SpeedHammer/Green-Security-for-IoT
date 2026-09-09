@@ -63,7 +63,7 @@ uint8_t decrypt(uint8_t *plain_text, uint8_t *tag, uint8_t *cipher_text, uint32_
     uint8_t tag_new[KEY_SIZE];
     init_data(&data, cipher_text, cipher_text_len, associated_data, adlen, key, nonce);
     isap_mac(tag_new, &data, cipher_text);
-    printf("decrypted tag: %s\n", bytes_to_hex(tag_new, KEY_SIZE));
+    //printf("decrypted tag: %s\n", bytes_to_hex(tag_new, KEY_SIZE));
     if (!verify_tag(tag, tag_new))
 	return 0;
     isap_enc(plain_text, &data);
@@ -84,10 +84,10 @@ void isap_enc(uint8_t *cipher_text, Isap_data *data)
 {
     uint64_t state[5];
     uint32_t i, n_message_blocks;
-    uint8_t offset;
+    uint32_t offset;
     isap_rk_enc((uint8_t*)state, data->key, data->nonce);
     memcpy((uint8_t*)state + STATE_SIZE - NONCE_SIZE, data->nonce, NONCE_SIZE);
-    printf("state after rk: %s\n", bytes_to_hex((uint8_t*)state, 40));
+    //printf("state after rk: %s\n", bytes_to_hex((uint8_t*)state, 40));
 
     n_message_blocks = data->message_len / BLOCK_SIZE + (data->message_len % BLOCK_SIZE ? 1 : 0);
 
@@ -99,7 +99,8 @@ void isap_enc(uint8_t *cipher_text, Isap_data *data)
     
     offset = (n_message_blocks - 1) * BLOCK_SIZE;
     permute(state);
-    xor_block(cipher_text + offset, data->message + offset, (uint8_t*)state, data->message_len % BLOCK_SIZE); /* TODO: Optimize % */
+    uint8_t last_len =data->message_len % BLOCK_SIZE
+    xor_block(cipher_text + offset, data->message + offset, (uint8_t*)state, last_len);
 
 }
 
@@ -112,19 +113,19 @@ void isap_mac(uint8_t *tag, Isap_data *data, uint8_t *ciper_text)
 {
     uint64_t state[5];
     init_state_mac(state, data);
-    printf("state after init state mac: %s\n", bytes_to_hex((uint8_t*)state, STATE_SIZE));
+    //printf("state after init state mac: %s\n", bytes_to_hex((uint8_t*)state, STATE_SIZE));
     absorb_associated_data(state, data);
-    printf("state after absorb ad: %s\n", bytes_to_hex((uint8_t*)state, STATE_SIZE));
+    //printf("state after absorb ad: %s\n", bytes_to_hex((uint8_t*)state, STATE_SIZE));
     absorb_cipher_text(state, data, ciper_text);
-    printf("state after absorb cipher text: %s\n", bytes_to_hex((uint8_t*)state, STATE_SIZE));
+    //printf("state after absorb cipher text: %s\n", bytes_to_hex((uint8_t*)state, STATE_SIZE));
     squeeze_tag(tag, state, data);
 }
 
 void init_state_mac(uint64_t *state, Isap_data *data)
 {
-    printf("nonce in init state: %s\n", bytes_to_hex(data->nonce, NONCE_SIZE));
+   // printf("nonce in init state: %s\n", bytes_to_hex(data->nonce, NONCE_SIZE));
     memcpy(state, data->nonce, NONCE_SIZE);
-    printf("nonce after noce copy: %s\n", bytes_to_hex(data->nonce, NONCE_SIZE));
+   // printf("nonce after noce copy: %s\n", bytes_to_hex(data->nonce, NONCE_SIZE));
     memcpy((uint8_t*)state + NONCE_SIZE, iv_a, IV_SIZE);
     state[3] = 0;
     state[4] = 0;
@@ -139,7 +140,7 @@ void absorb_associated_data(uint64_t *state, Isap_data *data)
     for (i = 0; i < n_ad_blocks; i++)
     {
 	get_block_padded((uint8_t*)&adblock, data->associated_data, data->adlen, i);
-	printf("ad block %d: %s\n", i, bytes_to_hex((uint8_t*)&adblock, BLOCK_SIZE));
+	//printf("ad block %d: %s\n", i, bytes_to_hex((uint8_t*)&adblock, BLOCK_SIZE));
 	state[0] ^= adblock;
 	permute(state);
     }
@@ -154,7 +155,7 @@ void absorb_cipher_text(uint64_t *state, Isap_data *data, uint8_t *cipher_text)
     for (i = 0; i < n_c_blocks; i++)
     {
 	get_block_padded((uint8_t*)&cblock, cipher_text, data->message_len, i);
-	printf("c block %d: %s\n", i, bytes_to_hex((uint8_t*)&cblock, BLOCK_SIZE));
+	//printf("c block %d: %s\n", i, bytes_to_hex((uint8_t*)&cblock, BLOCK_SIZE));
 	state[0] ^= cblock;
 	permute(state);
     }
@@ -179,7 +180,7 @@ void get_block_padded(uint8_t *output, uint8_t *data, uint32_t data_len, uint32_
 
 void squeeze_tag(uint8_t *tag, uint64_t *state, Isap_data *data)
 {
-    printf("key : %s\n", bytes_to_hex(data->key, KEY_SIZE));
+    //printf("key : %s\n", bytes_to_hex(data->key, KEY_SIZE));
     isap_rk_mac((uint8_t*)state, data->key, (uint8_t*)state);
     permute(state);
     memcpy(tag, state, KEY_SIZE);
@@ -192,18 +193,18 @@ void isap_rk_mac(uint8_t *output, uint8_t *key, uint8_t *input)
 
 void isap_rk(uint8_t *output, uint8_t *key, uint8_t *input, uint8_t outlen, uint8_t *iv)
 {
-    printf("isap rk, outlen: %d\n", outlen);
+    //printf("isap rk, outlen: %d\n", outlen);
     uint64_t state[5];
     uint8_t i, j, current_bit;
-    printf("key : %s\n", bytes_to_hex(key, KEY_SIZE));
+   // printf("key : %s\n", bytes_to_hex(key, KEY_SIZE));
     memcpy(state, key, KEY_SIZE);
-    printf("state after copying key: %s\n", bytes_to_hex((uint8_t*)state, STATE_SIZE));
+   // printf("state after copying key: %s\n", bytes_to_hex((uint8_t*)state, STATE_SIZE));
     memcpy(state + 2, iv, IV_SIZE);
     state[3] = 0; 
     state[4] = 0;
-    printf("state before perm rk: %s\n", bytes_to_hex((uint8_t*)state, 40));
+    //printf("state before perm rk: %s\n", bytes_to_hex((uint8_t*)state, 40));
     permute(state);
-    printf("state after perm rk: %s\n", bytes_to_hex((uint8_t*)state, 40));
+    //printf("state after perm rk: %s\n", bytes_to_hex((uint8_t*)state, 40));
 
     for (i = 0; i < NONCE_SIZE; i++)
     {
@@ -270,7 +271,7 @@ uint8_t verify_tag(uint8_t *tag, uint8_t *tag_new)
 
 int main() {
    
-   uint8_t message[10240]
+   uint8_t message[10240];
    uint32_t message_len = fread(message, 1, sizeof(message), stdin);
 
     /* count = 625 */
@@ -303,6 +304,9 @@ int main() {
    // printf("tag verify: %d\n", verify);
 
     free(cipher_text);
+    free(key);
+    free(nonce);
+    free(ad);
     //free(plaint_text);
 
     printf("done!\n");
