@@ -46,7 +46,7 @@ uint8_t *encrypt(uint8_t *plain_text, uint64_t plain_text_len, uint8_t *key, uin
     a = (adlen >> 4) + ((adlen & 15) || adlen == 0? 1 : 0);
     m = (plain_text_len >> 4) + ((plain_text_len & 15) ? 1 : 0);
     
-    printf("a: %d, m: %d\nplain text len: %llu, adlen: %llu\n", a, m, plain_text_len, adlen);
+   // printf("a: %d, m: %d\nplain text len: %llu, adlen: %llu\n", a, m, plain_text_len, adlen);
 
     y = (uint64_t*)malloc(a * 16 + m * 16 + 16);
     x = (uint64_t*)malloc(a * 16 + m * 16);
@@ -58,28 +58,28 @@ uint8_t *encrypt(uint8_t *plain_text, uint64_t plain_text_len, uint8_t *key, uin
 
     process_associated_data(y, x, associated_data, adlen, a, key, &L, m);
 
-    printf("y: %s\n", bytes_to_hex((uint8_t*)y, 32));
+    //printf("y: %s\n", bytes_to_hex((uint8_t*)y, 32));
     process_plain_text(cipher_text, y, x, plain_text, plain_text_len, key, &L, a, m);
-    printf("tag last y: %d\n", 2 * (a + m));
+    //printf("tag last y: %d\n", 2 * (a + m));
     memcpy(tag, y + 2 * (a + m), 16);
     free(y);
     free(x);
-    printf("cipher text: %s\n", bytes_to_hex(cipher_text, plain_text_len));
-    printf("tag: %s\n", bytes_to_hex(tag, 16));
+    //printf("cipher text: %s\n", bytes_to_hex(cipher_text, plain_text_len));
+    //printf("tag: %s\n", bytes_to_hex(tag, 16));
     return cipher_text;
 }
 
 void process_associated_data(uint64_t *y, uint64_t *x, uint8_t *associated_data, uint64_t adlen, uint32_t a, uint8_t *key, uint64_t *L, uint32_t m)
 {
-    printf("process_associated_data\n");
+    //printf("process_associated_data\n");
     uint32_t i;
     uint64_t last_block[2];
     for (i = 0; i < a - 1; i++)
     {
-	printf("i: %d\n", i);
+	//printf("i: %d\n", i);
         double_half_block((uint8_t*)L, (uint8_t*)L); /* L <- 2.L */
 	process_ad_block(y, x, (uint64_t*)associated_data + 2 * i , key, i << 1, L);
-	printf("--- i: %d\n", i);
+	//printf("--- i: %d\n", i);
     }
 
     triple_half_block((uint8_t*)L, (uint8_t*)L);
@@ -93,9 +93,9 @@ void process_associated_data(uint64_t *y, uint64_t *x, uint8_t *associated_data,
     }
 
     pad((uint8_t*)last_block, associated_data, adlen);
-    printf("pad (AD): %s\n", bytes_to_hex((uint8_t*)last_block, 16));
+    //printf("pad (AD): %s\n", bytes_to_hex((uint8_t*)last_block, 16));
     process_ad_block(y, x, last_block, key, (a - 1) << 1, L);
-    printf("process_associated_data done\n");
+   // printf("process_associated_data done\n");
 }
 
 void process_ad_block(uint64_t *y, uint64_t *x, uint64_t *associated_data, uint8_t *key, uint32_t j, uint64_t *L)
@@ -109,7 +109,7 @@ void process_ad_block(uint64_t *y, uint64_t *x, uint64_t *associated_data, uint8
 
 void process_plain_text(uint8_t *cipher_text, uint64_t *y, uint64_t *x, uint8_t *plain_text, uint64_t plain_text_len, uint8_t *key, uint64_t *L, uint32_t a, uint32_t m)
 {
-    printf("process_plain_text\n");
+    //printf("process_plain_text\n");
     uint32_t i;
     uint64_t last_block[2];
     if (plain_text_len == 0) return;
@@ -123,11 +123,11 @@ void process_plain_text(uint8_t *cipher_text, uint64_t *y, uint64_t *x, uint8_t 
     if (plain_text_len & 15)
 	triple_half_block((uint8_t*)L, (uint8_t*)L);
 
-    printf("PT before pad: %s\n", bytes_to_hex(plain_text, plain_text_len));
+    //printf("PT before pad: %s\n", bytes_to_hex(plain_text, plain_text_len));
     pad((uint8_t*)last_block, plain_text, plain_text_len);
-    printf("pad (PT): %s\n", bytes_to_hex((uint8_t*)last_block, 16));
+    //printf("pad (PT): %s\n", bytes_to_hex((uint8_t*)last_block, 16));
     process_plain_text_block(cipher_text, y, x, last_block, key, (m - 1) << 1, L, a);
-    printf("process_plain_text done\n");
+    //printf("process_plain_text done\n");
 }
 
 void process_plain_text_block(uint8_t *cipher_text, uint64_t *y, uint64_t *x, uint64_t *plain_text_block, uint8_t *key, uint32_t j, uint64_t *L, uint32_t a)
@@ -153,7 +153,7 @@ uint8_t *decrypt(uint8_t *cipher_text, uint64_t cipher_text_len, uint8_t *key, u
     a = (adlen >> 4) + ((adlen & 15) || adlen == 0? 1 : 0);
     m = (cipher_text_len >> 4) + ((cipher_text_len & 15) ? 1 : 0);
     
-    printf("a: %d, m: %d\nplain text len: %llu, adlen: %llu\n", a, m, cipher_text_len, adlen);
+    //printf("a: %d, m: %d\nplain text len: %llu, adlen: %llu\n", a, m, cipher_text_len, adlen);
 
     y = (uint64_t*)malloc(a * 16 + m * 16 + 16);
     x = (uint64_t*)malloc(a * 16 + m * 16);
@@ -169,9 +169,9 @@ uint8_t *decrypt(uint8_t *cipher_text, uint64_t cipher_text_len, uint8_t *key, u
     memcpy(tag, y + 2 * (a + m), 16);
     free(y);
     free(x);
-    printf("plain text: %s\n", bytes_to_hex(plain_text, cipher_text_len));
-    printf("tag: %s\n", bytes_to_hex(tag, 16));
-    return cipher_text;
+    //printf("plain text: %s\n", bytes_to_hex(plain_text, cipher_text_len));
+    //printf("tag: %s\n", bytes_to_hex(tag, 16));
+    return plain_text;
 }
     
 void process_cipher_text(uint8_t *plain_text, uint64_t *y, uint64_t *x, uint8_t *cipher_text, uint64_t cipher_text_len, uint8_t *key, uint64_t *L, uint32_t a, uint32_t m)
@@ -253,7 +253,7 @@ void pad(uint8_t *result, uint8_t *block, uint32_t len)
 {
     uint8_t dif;
     dif =  len & 15;
-    printf("dif: %d, len: %d\n", dif, len);
+    //printf("dif: %d, len: %d\n", dif, len);
     if (dif > 0 || len == 0)
     {
 	memcpy(result, block + len - dif, dif);
@@ -285,12 +285,22 @@ int main()
     uint8_t *ad = hex_to_bytes(ad_hex, sizeof(ad_hex));
     uint32_t adlen = sizeof(ad_hex) / 2;
 
-    cipher_text = (uint8_t*)malloc(16);
-    printf("adlen: %d\n", adlen);
-    cipher_text = encrypt(message, message_len, key, ad, adlen, nonce);
-    printf("decrypt----\n");
-    decrypt(cipher_text, message_len, key, ad, adlen, nonce);
+    //cipher_text = (uint8_t*)malloc(16);
+    //printf("adlen: %d\n", adlen);
+
+    cipher_text = encrypt(message, message_len, key, ad, adlen, nonce); 
     free(cipher_text);
+
+    for(int i = 1; i < 1000; i++){
+        encrypt(message, message_len, key, ad, adlen, nonce);
+    };
+
+    //printf("decrypt----\n");
+    //uint8_t *decrypt = decrypt(cipher_text, message_len, key, ad, adlen, nonce);
+    free(cipher_text);
+    free(key);
+    free(nonce);
+    free(ad);
     //free(message);
     printf("done!\n");
 
