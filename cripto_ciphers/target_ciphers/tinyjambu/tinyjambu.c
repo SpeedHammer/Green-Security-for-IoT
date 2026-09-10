@@ -64,7 +64,7 @@ void initialize(uint32_t* state, uint8_t *key, uint8_t *nonce)
 
 void process_ad(uint32_t *state, uint8_t* key, uint8_t *ad, uint32_t adlen) 
 {
-    printf("adlen=%d\n", adlen);
+    //printf("adlen=%d\n", adlen);
     uint32_t i, lenp;
     uint32_t n, startp;
     n = adlen >> 2;
@@ -77,12 +77,12 @@ void process_ad(uint32_t *state, uint8_t* key, uint8_t *ad, uint32_t adlen)
     }
 
     lenp = adlen & 3; // adlen % 32 
-    printf("lenp=%d\n", lenp);
+    //printf("lenp=%d\n", lenp);
 
     if (lenp > 0) 
     {
 	 startp = adlen - lenp;
-	 printf("startp=%d\n", startp);
+	 //printf("startp=%d\n", startp);
 	 state[1] ^= FRAME_BITS_AD;
 	 update_state(state, key, N_ROUNDS_1);
 	 for (i = 0; i < lenp; i++)
@@ -189,9 +189,9 @@ uint8_t* decrypt(uint8_t* cipher_text, const uint32_t cipher_text_len, uint8_t* 
     process_ad(state, key, ad, adlen);
     processs_cipher_text(state, key, cipher_text, cipher_text_len, plaintext);
     finalize_encrypt(state, key, tag_);
-    printf("tag' : %s\n", bytes_to_hex(tag_, 8));
-    valid = *((uint64_t*)tag) == *((uint64_t*)tag_);
-    printf("valid : %d\n", valid);
+    //printf("tag' : %s\n", bytes_to_hex(tag_, 8));
+   // valid = *((uint64_t*)tag) == *((uint64_t*)tag_);
+    //printf("valid : %d\n", valid);
     return plaintext;
 }
 
@@ -231,6 +231,10 @@ char* bytes_to_hex(uint8_t* bytes, uint32_t len)
 
 int main() 
 {
+
+    uint8_t message[10240];
+    uint32_t message_len = fread(message, 1, sizeof(message), stdin) ;
+
     uint8_t *cipher_text;//, *plain_text;
     uint8_t tag[8];
     /* Test vector 451 */
