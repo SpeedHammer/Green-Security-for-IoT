@@ -99,7 +99,7 @@ void isap_enc(uint8_t *cipher_text, Isap_data *data)
     
     offset = (n_message_blocks - 1) * BLOCK_SIZE;
     permute(state);
-    uint8_t last_len =data->message_len % BLOCK_SIZE
+    uint8_t last_len =data->message_len % BLOCK_SIZE;
     xor_block(cipher_text + offset, data->message + offset, (uint8_t*)state, last_len);
 
 }
