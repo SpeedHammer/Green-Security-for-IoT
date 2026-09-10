@@ -100,6 +100,7 @@ void isap_enc(uint8_t *cipher_text, Isap_data *data)
     offset = (n_message_blocks - 1) * BLOCK_SIZE;
     permute(state);
     uint8_t last_len =data->message_len % BLOCK_SIZE;
+    if (last_len == 0) last_len = BLOCK_SIZE;
     xor_block(cipher_text + offset, data->message + offset, (uint8_t*)state, last_len);
 
 }
@@ -295,8 +296,14 @@ int main() {
         encrypt(cipher_text, tag, message, message_len, key, ad, adlen, nonce); 
     };
 
-    printf("cipher_text: %s\n", bytes_to_hex(cipher_text, message_len));
-    printf("tag: %s\n", bytes_to_hex(tag, 16));
+    char *ct_hex = bytes_to_hex(cipher_text, message_len);
+    char *tag_hex = bytes_to_hex(tag, 16);
+
+    printf("cipher_text: %s\n", ct_hex);
+    printf("tag: %s\n", tag_hex);
+
+    free(ct_hex);
+    free(tag_hex);
 
    // uint8_t *plaint_text = (uint8_t*)malloc(message_len);
    // uint8_t verify = decrypt(plaint_text, tag, cipher_text, message_len, key, ad, adlen, nonce);
