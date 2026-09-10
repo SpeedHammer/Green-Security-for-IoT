@@ -1,9 +1,9 @@
 All algorithms are written in C
 
-In need of fix:
+To fix:
 * TyniJumbo
 * Xoodyak
-* All trafitional algorithms (not really all but tey need a review)
+* All traditional algorithms (not really all but tey need a review)
 
 The final PowerJoular measurements were recorded in the result logs.
 
