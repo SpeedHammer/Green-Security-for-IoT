@@ -228,14 +228,19 @@ int main() {
     encrypt(cipher_text, tag, message, message_len, key, ad, adlen, nonce); 
     };
 
-    printf("cipher_text: %s\n", bytes_to_hex(cipher_text, message_len));
-    printf("tag: %s\n", bytes_to_hex(tag, 16));
+    char *cf_text = bytes_to_hex(cipher_text, message_len);
+    char *tg = bytes_to_hex(tag, 16);
+
+    printf("cipher_text: %s\n", cf_text);
+    printf("tag: %s\n", tg);
 
 //    uint8_t *plaint_text = (uint8_t*)malloc(message_len);
 //    uint8_t verify = decrypt(plaint_text, tag, cipher_text, message_len, key, ad, adlen, nonce);
 //    printf("decryptted plain text: %s\n", bytes_to_hex(plaint_text, message_len));
 //    printf("tag verify: %d\n", verify);
 
+    free(tg);
+    free(cf_text);
     free(cipher_text);
 //    free(plaint_text);
     free(key);

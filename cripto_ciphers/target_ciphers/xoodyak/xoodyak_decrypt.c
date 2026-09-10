@@ -243,8 +243,11 @@ int main()
     };
 
     uint8_t tag_matches = decrypt(decrypted_plaintext, tag, cipher_text, message_len, key, ad, adlen, nonce);
-    
-    printf("decrypted plain text: %s\n", bytes_to_hex(decrypted_plaintext, message_len));
+
+    char *pt_hex = bytes_to_hex(decrypted_plaintext, message_len);
+    printf("decrypted plain text: %s\n", pt_hex);
+    free(pt_hex);
+
     printf("tag matches = %d\n", tag_matches);
 
     
