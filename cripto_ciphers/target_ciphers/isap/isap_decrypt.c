@@ -321,7 +321,7 @@ int main() {
     free(key);
     free(nonce);
     free(ad);
-    //free(plaint_text);
+    free(plaint_text);
 
     printf("done!\n");
     return 0;

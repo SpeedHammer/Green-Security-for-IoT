@@ -1,8 +1,15 @@
 std=c99
-src=isap.c ../../utils/hex_utils.c ../../ascon/src/ascon_permutation.c 
+src1=isap_encrypt.c ../utils/hex_utils.c ../ascon/ascon_permutation.c 
+src2=isap_decrypt.c ../utils/hex_utils.c ../ascon/ascon_permutation.c 
 
-isap: $(src)
-	gcc -std=$(std) -o $@ $(src) 
+make : isap_encrypt isap_decrypt
+
+isap_decrypt: $(src2)
+	gcc -O2 -std=$(std) -o $@ $(src2) 
+
+
+isap_encrypt: $(src1)
+	gcc -O2 -std=$(std) -o $@ $(src1) 
 
 clean:
-	rm isap.exe
+	rm isap_encrypt isap_decrypt

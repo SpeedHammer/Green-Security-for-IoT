@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../ascon/src/ascon_permutation.h"
-#include "../../utils/hex_utils.h"
+#include "../ascon/ascon_permutation.h"
+#include "../utils/hex_utils.h"
 #include <stdio.h>
 
 
