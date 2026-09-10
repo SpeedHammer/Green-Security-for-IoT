@@ -3,7 +3,6 @@ All algorithms are written in C
 QUESTION: Should I use the flag -O2?
 
 To fix:
-* Xoodyak
 * All traditional algorithms (not really all, but they need a review)
 
 The final PowerJoular measurements were recorded in the result logs.
