@@ -93,7 +93,8 @@ void process_ad(uint32_t *state, uint8_t* key, uint8_t *ad, uint32_t adlen)
 
 void process_plaintext(uint32_t *state, uint8_t *key, uint8_t *message, uint32_t message_len, uint8_t *cipher_text)
 {
-    uint8_t i, lenp;
+    uint32_t i;
+    uint8_t  lenp;
     uint32_t n, startp;
     n = message_len >> 2; // message_len / 4
 
@@ -136,7 +137,7 @@ uint8_t* encrypt(uint8_t *message, const uint32_t message_len, uint8_t *key, uin
 {
     uint32_t state[4];
     uint8_t *cipher_text;
-    printf("%d\n", message_len);
+   // printf("%d\n", message_len);
     cipher_text = (uint8_t*)malloc(message_len + 1);
 
     initialize(state, key, nonce);
@@ -148,7 +149,8 @@ uint8_t* encrypt(uint8_t *message, const uint32_t message_len, uint8_t *key, uin
 
 void processs_cipher_text(uint32_t *state, uint8_t *key, uint8_t *cipher_text, uint32_t cipher_text_len, uint8_t *plain_text)
 {
-    uint8_t i, lenp;
+    uint32_t i;
+    uint8_t  lenp;
     uint32_t n, startp;
     n = cipher_text_len >> 2;
 
@@ -251,11 +253,27 @@ int main()
     uint8_t* key = hex_to_bytes(key_hex, sizeof(key_hex));
     uint8_t *nonce = hex_to_bytes(nonce_hex, sizeof(nonce_hex));
 
+    for(int i = 0; i<999; i++){
+         encrypt(message, message_len, key, nonce, ad, adlen, tag);
+    };
     cipher_text = encrypt(message, message_len, key, nonce, ad, adlen, tag);
-    //plain_text = decrypt(cipher_text, message_len, key, nonce, ad, adlen, tag);
 
-    printf("cipher text         : %s\n", bytes_to_hex(cipher_text, message_len));
+
+
+//plain_text = decrypt(cipher_text, message_len, key, nonce, ad, adlen, tag);
+
+    uint8_t *cf_text = bytes_to_hex(cipher_text, message_len);
+ 
+    printf("cipher text         : %s\n", cf_text);
     //printf("decrypted plain text: %s\n", bytes_to_hex(plain_text, message_len));
     printf("tag                 : %s\n", bytes_to_hex(tag, 8));
     printf("done!");
+
+    free(cf_text);
+    free(cipher_text);
+    free(key);
+    free(nonce);
+    free(ad);
+
+    return 0;
 }
