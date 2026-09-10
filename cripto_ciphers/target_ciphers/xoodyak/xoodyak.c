@@ -233,12 +233,21 @@ int main()
          encrypt(cipher_text, tag, message, message_len, key, ad, adlen, nonce); 
     };
 
-    printf("cipher_text: %s\n", bytes_to_hex(cipher_text, message_len));
-    printf("tag: %s\n", bytes_to_hex(tag, 16));
+
+    char *ct_hex = bytes_to_hex(cipher_text, message_len);
+    char *tag_hex = bytes_to_hex(tag, 16);
+
+    printf("cipher_text: %s\n", ct_hex);
+    printf("tag: %s\n", tag_hex);
 
     //uint8_t tag_matches = decrypt(decrypted_plaintext, tag, cipher_text, message_len, key, ad, adlen, nonce);
     //printf("decrypted plain text: %s\n", bytes_to_hex(decrypted_plaintext, message_len));
     //printf("tag matches = %d\n", tag_matches);
+
+    free(cipher_text);
+    free(key);
+    free(nonce);
+    free(ad);
 
     printf("done!\n");
     return 0;
