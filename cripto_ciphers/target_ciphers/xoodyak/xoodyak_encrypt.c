@@ -244,6 +244,8 @@ int main()
     //printf("decrypted plain text: %s\n", bytes_to_hex(decrypted_plaintext, message_len));
     //printf("tag matches = %d\n", tag_matches);
 
+    free(ct_hex);
+    free(tag_hex);
     free(cipher_text);
     free(key);
     free(nonce);

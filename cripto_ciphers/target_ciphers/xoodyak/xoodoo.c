@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "xoodoo.h"
-#include "../../utils/hex_utils.h"
+#include "../utils/hex_utils.h"
 
 
 #define ROTATE_L_32(a, n) (((a) << ((n) % 32)) | ((a) >> ((32 - (n)) % 32)))
