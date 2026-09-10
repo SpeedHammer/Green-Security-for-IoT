@@ -254,21 +254,24 @@ int main()
     uint8_t *nonce = hex_to_bytes(nonce_hex, sizeof(nonce_hex));
 
     for(int i = 0; i<999; i++){
-         encrypt(message, message_len, key, nonce, ad, adlen, tag);
-    };
+         uint8_t *tmp = encrypt(message, message_len, key, nonce, ad, adlen, tag);
+         free(tmp);
+};
     cipher_text = encrypt(message, message_len, key, nonce, ad, adlen, tag);
 
 
 
 //plain_text = decrypt(cipher_text, message_len, key, nonce, ad, adlen, tag);
 
-    uint8_t *cf_text = bytes_to_hex(cipher_text, message_len);
- 
+    char *cf_text = bytes_to_hex(cipher_text, message_len);
+    char *tg = bytes_to_hex(tag, 8);
+
     printf("cipher text         : %s\n", cf_text);
     //printf("decrypted plain text: %s\n", bytes_to_hex(plain_text, message_len));
-    printf("tag                 : %s\n", bytes_to_hex(tag, 8));
+    printf("tag                 : %s\n", tg);
     printf("done!");
 
+    free(tg);
     free(cf_text);
     free(cipher_text);
     free(key);
