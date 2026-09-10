@@ -1,7 +1,7 @@
 All algorithms are written in C
 
 To fix:
-* TyniJumbo
+* TinyJumbo
 * Xoodyak
 * All traditional algorithms (not really all but tey need a review)
 
