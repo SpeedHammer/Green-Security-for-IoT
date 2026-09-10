@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 
 #define FRAME_BITS_NONCE 0x10
@@ -237,7 +238,7 @@ int main()
     uint8_t message[10240];
     uint32_t message_len = fread(message, 1, sizeof(message), stdin) ;
 
-    uint8_t *cipher_text;//, *plain_text;
+    uint8_t *cipher_text, *plain_text;
     uint8_t tag[8];
     /* Test vector 451 */
    // char message_hex[] = "00";
@@ -256,10 +257,9 @@ int main()
     cipher_text = encrypt(message, message_len, key, nonce, ad, adlen, tag);
 
     for(int i = 0; i<999; i++){
-       char temp = decrypt(cipher_text, message_len, key, nonce, ad, adlen, tag);
+        uint8_t *temp = decrypt(cipher_text, message_len, key, nonce, ad, adlen, tag);
+        free(tmp);
     };
-
-    free(tmp);
 
     plain_text = decrypt(cipher_text, message_len, key, nonce, ad, adlen, tag);
 
