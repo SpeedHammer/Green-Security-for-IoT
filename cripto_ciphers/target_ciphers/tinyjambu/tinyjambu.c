@@ -231,27 +231,27 @@ char* bytes_to_hex(uint8_t* bytes, uint32_t len)
 
 int main() 
 {
-    uint8_t *cipher_text, *plain_text;
+    uint8_t *cipher_text;//, *plain_text;
     uint8_t tag[8];
     /* Test vector 451 */
-    char message_hex[] = "00";
+   // char message_hex[] = "00";
     char ad_hex[] = "";
 
     char key_hex[] = "000102030405060708090A0B0C0D0E0F";
     char nonce_hex[] = "000102030405060708090A0B";
     
-    uint8_t* message = hex_to_bytes(message_hex, sizeof(message_hex));
-    uint32_t message_len = sizeof(message_hex) / 2;
+   // uint8_t* message = hex_to_bytes(message_hex, sizeof(message_hex));
+   // uint32_t message_len = sizeof(message_hex) / 2;
     uint8_t* ad = hex_to_bytes(ad_hex, sizeof(ad_hex));
     uint32_t adlen = sizeof(ad_hex) / 2;
     uint8_t* key = hex_to_bytes(key_hex, sizeof(key_hex));
     uint8_t *nonce = hex_to_bytes(nonce_hex, sizeof(nonce_hex));
 
     cipher_text = encrypt(message, message_len, key, nonce, ad, adlen, tag);
-    plain_text = decrypt(cipher_text, message_len, key, nonce, ad, adlen, tag);
+    //plain_text = decrypt(cipher_text, message_len, key, nonce, ad, adlen, tag);
 
     printf("cipher text         : %s\n", bytes_to_hex(cipher_text, message_len));
-    printf("decrypted plain text: %s\n", bytes_to_hex(plain_text, message_len));
+    //printf("decrypted plain text: %s\n", bytes_to_hex(plain_text, message_len));
     printf("tag                 : %s\n", bytes_to_hex(tag, 8));
     printf("done!");
 }
