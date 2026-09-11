@@ -3,7 +3,7 @@ CFLAGS = -O2
 LDFLAGS = -lssl -lcrypto -lm -lmcrypt
 
 SRC_DIR = $(HOME)/cripto_benchmark_pipeline/cripto_ciphers/ciphers
-BIN_DIR = $(HOME)/cripto_benchmark_pipeline/bin
+BIN_DIR = $(HOME)/cripto_benchmark_pipeline/bin/classic_ciphers
 LOG_DIR = $(HOME)/cripto_benchmark_pipeline/compilation_error_logs
 
 CIPHERS = AES_Algorithm caeser_cipher RSA_algorithm xor_cipher \
