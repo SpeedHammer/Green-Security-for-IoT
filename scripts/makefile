@@ -25,7 +25,7 @@ $(BIN_DIR)/%: $(SRC_DIR)/%.c
 
 lwc_make:
 	for cipher in $(LWC_CIPHERS); do \
-		$(MAKE) -C $(LWC_SRC)/$$cipher; \
+		$(MAKE) -C $(LWC_SRC)/$$cipher 2> $(LOG_DIR)/$$cipher.log; \
 	done
 
 clean:
