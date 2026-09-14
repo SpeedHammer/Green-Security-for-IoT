@@ -193,8 +193,12 @@ uint8_t* decrypt(uint8_t* cipher_text, const uint32_t cipher_text_len, uint8_t* 
     processs_cipher_text(state, key, cipher_text, cipher_text_len, plaintext);
     finalize_encrypt(state, key, tag_);
     //printf("tag' : %s\n", bytes_to_hex(tag_, 8));
-   // valid = *((uint64_t*)tag) == *((uint64_t*)tag_);
+    valid = *((uint64_t*)tag) == *((uint64_t*)tag_);
     //printf("valid : %d\n", valid);
+	if (!valid) {
+        printf("Verification: FAILED\n");
+        memset(plaintext, 0, cipher_text_len);
+    }
     return plaintext;
 }
 
