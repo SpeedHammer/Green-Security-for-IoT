@@ -13,10 +13,10 @@ make: xoodyak_encrypt xoodyak_decrypt
 
 
 xoodyak_encrypt:
-	gcc -O2 $(args) -o $(LWC_BIN)/$@ $(src1)
+	gcc $(args) -o $(LWC_BIN)/$@ $(src1)
 
 xoodyak_decrypt: 
-	gcc -O2 $(args) -o $(LWC_BIN)/$@ $(src2)
+	gcc $(args) -o $(LWC_BIN)/$@ $(src2)
 
 xoodoo: $(xoodoo_src)
 	gcc $(args) -D $(xoodoo_test) -o $@ $(xoodoo_src)
