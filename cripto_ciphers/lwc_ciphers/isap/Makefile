@@ -6,8 +6,8 @@ LWC_BIN = $(HOME)/cripto_benchmark_pipeline/bin/lwc_ciphers
 make : isap_encrypt isap_decrypt
 
 isap_decrypt: $(src2)
-	gcc -O2 -std=$(std) -o $(LWC_BIN)/$@ $(src2) 
+	gcc -std=$(std) -o $(LWC_BIN)/$@ $(src2) 
 
 
 isap_encrypt: $(src1)
-	gcc -O2 -std=$(std) -o $(LWC_BIN)/$@ $(src1) 
+	gcc -std=$(std) -o $(LWC_BIN)/$@ $(src1) 
