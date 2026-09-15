@@ -16,6 +16,9 @@ for type in "${RUN[@]}"; do
                 (cat ~/cripto_benchmark_pipeline/inputs/"$file") | ~/cripto_benchmark_pipeline/bin/lwc_ciphers/ascon_"$type" > /dev/null & P_PID=$!
                 kill -STOP "$P_PID"
                 
+                echo "ASCON PID = $P_PID"
+                ps -p "$P_PID" -o pid,stat,cmd
+                
                 powerjoular -c -p "$P_PID" -f  "$OUTPUT"/ascon_"$type"_$(basename "$file" .txt).csv & PID=$!
                 sleep 1
         
