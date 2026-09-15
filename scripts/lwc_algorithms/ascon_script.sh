@@ -10,12 +10,18 @@ rm -f "$OUTPUT"/*
 
 for file in "${INPUTS[@]}"; do
 
-        powerjoular -c -f  "$OUTPUT"/ascon_$(basename "$file" .txt).csv & PID=$!
+        (cat ~/cripto_benchmark_pipeline/inputs/"$file") | ~/cripto_benchmark_pipeline/bin/ascon_encrypt_Algorithm > /dev/null & \
+        P_PID=$!
+        kill -STOP "$P_PID"
+        ps -p "$P_PID" -o  pid,stat,cmd
+
+        powerjoular -c -p "$P_PID" -f  "$OUTPUT"/ascon_$(basename "$file" .txt).csv & PID=$!
         sleep 1
 
-        (cat ~/cripto_benchmark_pipeline/inputs/"$file") | ~/cripto_benchmark_pipeline/bin/ascon_encrypt_Algorithm > /dev/null
+        kill -CONT "$P_PID"
 
-        kill "$PID"
+        wait "$P_PID"
+        kill "$PID" 2>/dev/null
         wait "$PID" 2>/dev/null
 
         sleep 1
