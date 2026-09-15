@@ -6,7 +6,7 @@ LWC_BIN = $(HOME)/cripto_benchmark_pipeline/bin/lwc_ciphers
 make: ascon_encrypt ascon_decrypt
 
 ascon_encrypt:
-	gcc -std=$(std) -O2 -o $(LWC_BIN)/$@ $(src1) 
+	gcc -std=$(std) -o $(LWC_BIN)/$@ $(src1) 
 
 ascon_decrypt:
-	gcc -std=$(std) -O2 -o $(LWC_BIN)/$@  $(src2)
+	gcc -std=$(std) -o $(LWC_BIN)/$@  $(src2)
