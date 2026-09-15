@@ -6,7 +6,7 @@ LWC_BIN = $(HOME)/cripto_benchmark_pipeline/bin/lwc_ciphers
 make: elephant_encrypt elephant_decrypt
 
 elephant_encrypt:
-	gcc -std=$(std) -O2 -o $(LWC_BIN)/$@ $(src1)
+	gcc -std=$(std) -o $(LWC_BIN)/$@ $(src1)
 
 elephant_decrypt:
-	gcc -std=$(std) -O2 -o $(LWC_BIN)/$@ $(src2)
+	gcc -std=$(std) -o $(LWC_BIN)/$@ $(src2)
