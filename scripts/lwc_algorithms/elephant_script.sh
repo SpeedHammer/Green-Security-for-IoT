@@ -13,8 +13,7 @@ rm -f "$OUTPUT"/*
 for type in "${RUN[@]}"; do        
         for file in "${INPUTS[@]}"; do
         
-                (cat ~/cripto_benchmark_pipeline/inputs/"$file") | ~/cripto_benchmark_pipeline/bin/lwc_ciphers/elephant_"$type" > /dev/null & \
-                P_PID=$!
+                (cat ~/cripto_benchmark_pipeline/inputs/"$file") | ~/cripto_benchmark_pipeline/bin/lwc_ciphers/elephant_"$type" > /dev/null & P_PID=$!
                 kill -STOP "$P_PID"
                 
                 powerjoular -c -p "$P_PID" -f  "$OUTPUT"/elephant_"$type"_$(basename "$file" .txt).csv & PID=$!
@@ -28,4 +27,4 @@ for type in "${RUN[@]}"; do
         
                 sleep 1
         done
-        
+done
