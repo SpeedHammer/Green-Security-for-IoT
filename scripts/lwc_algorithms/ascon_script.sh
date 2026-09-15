@@ -10,7 +10,7 @@ rm -f "$OUTPUT"/*
 
 for file in "${INPUTS[@]}"; do
 
-        (cat ~/cripto_benchmark_pipeline/inputs/"$file") | ~/cripto_benchmark_pipeline/bin/ascon_encrypt_Algorithm > /dev/null & \
+        (cat ~/cripto_benchmark_pipeline/inputs/"$file") | ~/cripto_benchmark_pipeline/bin/lwc_ciphers/ascon_encrypt > /dev/null & \
         P_PID=$!
         kill -STOP "$P_PID"
         ps -p "$P_PID" -o  pid,stat,cmd
