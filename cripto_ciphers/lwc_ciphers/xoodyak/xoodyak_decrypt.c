@@ -238,7 +238,7 @@ int main()
     printf("cipher_text: %s\n", ct_hex);
     printf("tag: %s\n", tag_hex);
 
-    for(int i = 0; i<999; i++){
+    for(int i = 0; i<9999; i++){
        decrypt(decrypted_plaintext, tag, cipher_text, message_len, key, ad, adlen, nonce);
     };
 
