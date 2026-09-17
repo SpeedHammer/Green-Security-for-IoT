@@ -13,7 +13,7 @@ rm -f "$OUTPUT"/*
 for type in "${RUN[@]}"; do        
         for file in "${INPUTS[@]}"; do
         
-                bash -c 'kill -STOP $$; exec ~/cripto_benchmark_pipeline/bin/lwc_ciphers/ascon_'"$type"' \
+                bash -c 'kill -STOP $$; exec ~/cripto_benchmark_pipeline/bin/lwc_ciphers/elephant_'"$type"' \
                 < ~/cripto_benchmark_pipeline/inputs/'"$file"' \
                 > /dev/null' & P_PID=$!
                 
