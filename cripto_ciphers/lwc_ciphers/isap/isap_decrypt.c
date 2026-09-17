@@ -305,7 +305,7 @@ int main() {
 
     uint8_t *plaint_text = (uint8_t*)malloc(message_len);
 
-    for(int i = 0; i<999; i++){
+    for(int i = 0; i<9999; i++){
         decrypt(plaint_text, tag, cipher_text, message_len, key, ad, adlen, nonce);
     };
 
