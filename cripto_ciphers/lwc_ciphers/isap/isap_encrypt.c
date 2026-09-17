@@ -292,7 +292,7 @@ int main() {
     uint8_t *cipher_text = (uint8_t*)malloc(message_len);
     uint8_t tag[20];
 
-    for(int i = 0; i<1000; i++){
+    for(int i = 0; i<10000; i++){
         encrypt(cipher_text, tag, message, message_len, key, ad, adlen, nonce); 
     };
 
