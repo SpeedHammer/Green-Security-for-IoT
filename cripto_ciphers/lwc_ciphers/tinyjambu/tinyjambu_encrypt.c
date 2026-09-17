@@ -253,7 +253,7 @@ int main()
     uint8_t* key = hex_to_bytes(key_hex, sizeof(key_hex));
     uint8_t *nonce = hex_to_bytes(nonce_hex, sizeof(nonce_hex));
 
-    for(int i = 0; i<999; i++){
+    for(int i = 0; i<9999; i++){
          uint8_t *tmp = encrypt(message, message_len, key, nonce, ad, adlen, tag);
          free(tmp);
 };
