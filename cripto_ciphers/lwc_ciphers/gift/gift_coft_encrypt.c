@@ -288,7 +288,7 @@ int main()
     //cipher_text = (uint8_t*)malloc(16);
     //printf("adlen: %d\n", adlen);
 
-    for(int i = 0; i < 999; i++){
+    for(int i = 0; i < 9999; i++){
        cipher_text = encrypt(message, message_len, key, ad, adlen, nonce);
        free(cipher_text);
     };
