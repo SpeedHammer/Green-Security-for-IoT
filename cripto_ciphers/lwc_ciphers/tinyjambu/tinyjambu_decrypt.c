@@ -260,7 +260,7 @@ int main()
 
     cipher_text = encrypt(message, message_len, key, nonce, ad, adlen, tag);
 
-    for(int i = 0; i<999; i++){
+    for(int i = 0; i<9999; i++){
         uint8_t *tmp = decrypt(cipher_text, message_len, key, nonce, ad, adlen, tag);
         free(tmp);
     };
