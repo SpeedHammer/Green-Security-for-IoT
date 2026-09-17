@@ -229,7 +229,7 @@ int main()
 
 //    printf("message %s, ad %s\n", bytes_to_hex(message, message_len), bytes_to_hex(ad, adlen));
 
-     for(int i = 0; i<1000; i++){
+     for(int i = 0; i<10000; i++){
          encrypt(cipher_text, tag, message, message_len, key, ad, adlen, nonce); 
     };
 
