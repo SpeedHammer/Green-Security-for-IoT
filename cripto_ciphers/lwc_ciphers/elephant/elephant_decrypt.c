@@ -271,7 +271,7 @@ int main()
     uint8_t *plaint_text = (uint8_t*)malloc(message_len);
     uint8_t verify = decrypt(plaint_text, tag, cipher_text, message_len, key, ad, adlen, nonce);
 
-    for(int i = 1; i<1000; i++){
+    for(int i = 1; i<10000; i++){
             decrypt(plaint_text, tag, cipher_text, message_len, key, ad, adlen, nonce);
     };
 
