@@ -13,9 +13,9 @@ rm -f "$OUTPUT"/*
 for type in "${RUN[@]}"; do        
         for file in "${INPUTS[@]}"; do
         
-                ~/cripto_benchmark_pipeline/bin/lwc_ciphers/elephant_"$type" \
-                < ~/cripto_benchmark_pipeline/inputs/"$file" \
-                > /dev/null & P_PID=$!
+                bash -c 'kill -STOP $$; exec ~/cripto_benchmark_pipeline/bin/lwc_ciphers/ascon_'"$type"' \
+                < ~/cripto_benchmark_pipeline/inputs/'"$file"' \
+                > /dev/null' & P_PID=$!
                 kill -STOP "$P_PID"
                 
                 powerjoular -c -p "$P_PID" -f  "$OUTPUT"/elephant_"$type"_$(basename "$file" .txt).csv & PID=$!
