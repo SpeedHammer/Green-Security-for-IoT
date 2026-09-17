@@ -295,7 +295,7 @@ int main()
 
     printf("decrypt----\n");
    
-    for(int i = 0; i < 999; i++){
+    for(int i = 0; i < 9999; i++){
        plain_text =  decrypt(cipher_text, message_len, key, ad, adlen, nonce);
        free(plain_text);
     };
