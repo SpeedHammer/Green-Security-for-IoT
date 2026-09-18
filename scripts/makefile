@@ -19,9 +19,8 @@ TARGETS = $(addprefix $(BIN_DIR)/,$(CIPHERS))
 
 make: classic_make lwc_make
 
-classic_make: $(TARGETS)
-$(BIN_DIR)/%: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS) 2> $(LOG_DIR)/$*.log
+classic_make:
+		$(MAKE) -C $(SRC_DIR) 2> $(LOG_DIR)/classic_make.log; \
 
 lwc_make:
 	for cipher in $(LWC_CIPHERS); do \
