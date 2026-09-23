@@ -1,5 +1,4 @@
 CC = gcc
-CFLAGS = -O2
 LDFLAGS = -lssl -lcrypto -lm -lmcrypt
 
 LWC_SRC = $(HOME)/cripto_benchmark_pipeline/cripto_ciphers/lwc_ciphers
