@@ -1,10 +1,8 @@
 # Green Security for IoT
 
-**Benchmarking Lightweight Cryptography vs. Traditional Cryptographic Standards on IoT Devices**
+Benchmarking lightweight cryptography and traditional cryptographic algorithms on a resource-constrained Raspberry Pi.
 
-Test platform: **Raspberry Pi 2 Model B v1.1** (ARMv7, quad-core, 1 GB RAM), used as a representative resource-constrained IoT device.
-
----
+> **Status:** Experimental research project. The repository provides the implementations and measurement scripts needed to collect benchmark data, but the current results should not yet be treated as a definitive comparison between all algorithm families.
 
 ## Motivation
 
@@ -17,160 +15,269 @@ IoT devices (sensors, wearables, microcontrollers, low-cost single-board compute
 
 Traditional cryptographic algorithms (AES, RSA, Triple DES, etc.) were not designed with these constraints as a primary goal. **Lightweight Cryptography (LWC)**, driven by NIST's standardization process, proposes algorithms optimized to provide adequate security at a much lower computational and energy cost — the trade-off this project aims to measure in practice.
 
-## Project Goal
 
-This project **does not aim to be a definitive benchmark**, but rather a starting point (*jumpstart*) for systematically collecting performance and energy-consumption data for cryptographic algorithms on constrained hardware.
+## Overview
 
-The Raspberry Pi is used here only as a **concrete example of an IoT device**; the same methodology applies to other resource-constrained platforms (Arduino, smartwatches, low-end smartphones, ESP32-class microcontrollers, etc.). The underlying goal is to eventually enable algorithm selection for a given IoT device to be based on **multi-objective criteria** — security, energy, performance, and memory — instead of a single isolated factor.
+This project investigates how cryptographic algorithms behave on an IoT-oriented platform with limited computing resources. It compares lightweight cryptography (LWC) algorithms with traditional cryptographic algorithms using:
 
-Concretely, this repository:
+- CPU utilization;
+- estimated total, CPU, and GPU power;
+- encryption and decryption workloads;
+- multiple input sizes;
+- repeatable PowerJoular measurements.
 
-1. Implements and compiles, in C, a set of **traditional** algorithms and a set of **lightweight (LWC)** algorithms.
-2. Runs each algorithm against several input sizes, under controlled and repeatable conditions.
-3. Measures the performance and energy consumption of each run.
-4. Organizes the results so algorithms can be directly compared.
+The experiments were designed for a **Raspberry Pi 2 Model B v1.1** with an ARMv7 quad-core CPU and 1 GB of RAM. Results collected on this device should not be generalized to other IoT platforms without repeating the experiments.
 
-## Comparison Methodology
+## Algorithms
 
-For the comparison between algorithms to be fair and reproducible, all of them go through the **same test protocol**:
+### Lightweight cryptography
 
-- **Same input sizes**: every algorithm is tested against files of `1 kB`, `2 kB`, `4 kB`, `8 kB`, and `10 kB` (see [`inputs/`](inputs)), to observe how performance and consumption scale with data size.
-- **Encrypt/decrypt measured separately**: each script measures the encryption and decryption operations independently. For decryption, one encryption run is executed first (to produce a valid ciphertext) before the measured decryption repetitions.
-- **No `-O2`**: compiler optimizations (`-O2`) were deliberately **not** used, because the compiler was folding/eliminating the benchmark loop entirely (dead-code elimination, since the loop's output is discarded), which invalidated the measurements. Builds are done without `-O2`.
-- **Repeated executions**: since a single run is too fast to produce measurable energy data, each algorithm's operation is repeated many times in a row so [PowerJoular](https://github.com/joular/powerjoular) can collect enough samples. **Note: this repetition count currently differs between the two algorithm sets and is a known inconsistency, see "Known Issues" below.**
-- **Measurement flag**: PowerJoular is run with the **`-c` flag**, which drops per-sample millisecond timestamps from the CSV output (only second-level timestamps are kept).
-- **Per-process measurement (LWC)**: for the lightweight algorithms, consumption is isolated to the algorithm's own process (`powerjoular -c -p <PID>`), separating the algorithm's cost from the rest of the system.
-- **Idle baseline**: a 10-second PowerJoular system log is also recorded at rest ([`results/idle_sys_10s.txt`](results/idle_sys_10s.txt)), used as a reference for the OS/system's own baseline cost.
-- **Metrics collected per run**: CPU utilization, total power, CPU power, and GPU power (columns of the PowerJoular `.csv` output).
+The repository includes implementations and benchmark scripts for:
 
-### Known Issues / To Fix
+- ASCON;
+- Elephant;
+- GIFT-COFB;
+- ISAP;
+- TinyJAMBU;
+- Xoodyak.
 
-- **Traditional-cipher scripts are broken and their results are invalid — need to be redone.** In `scripts/benchmark_algorithms/`, the 1000-iteration loop is done **in the shell script** (`for i in {1..1000}; do ... done`) *around* a single call to PowerJoular, and PowerJoular is **not** attached to the cipher's own PID (no `-p`). As a result, the recorded power/CPU data reflects the whole system for the duration of the loop, not the cipher process specifically, and the iteration count is **inconsistent with the LWC benchmarks** (see below). All data currently under `results/` for the traditional (classic) ciphers must be discarded and re-collected once the scripts are fixed.
-- **Mismatched repetition counts between the two algorithm sets**:
-  - **LWC algorithms**: the repetition loop is implemented **inside the C source itself** (e.g. a `for (i = 0; i < 10000; i++)` around the encrypt/decrypt call), so each measured run performs **10,000 iterations**.
-  - **Traditional algorithms**: the repetition loop is implemented **in the shell script**, invoking the binary **1,000 times**.
+### Traditional and reference algorithms
 
-  This mismatch means current results are **not directly comparable** between the two sets and must be aligned (either by moving the traditional ciphers' loop into C with 10,000 iterations, or by otherwise normalizing both approaches) before drawing conclusions.
-- Should `-O2` (or another optimization level) be reintroduced now that the loop lives inside the measured code (LWC) and can no longer be trivially eliminated? Still open for discussion for the traditional ciphers once their loop is fixed.
+The repository also includes:
 
-### Limitations to Keep in Mind
+- AES;
+- RSA;
+- Triple DES;
+- Blowfish;
+- Caesar;
+- Vigenère;
+- Playfair;
+- Rail Fence;
+- XOR;
+- Base64.
 
-- Results are specific to the Raspberry Pi 2 B v1.1 (ARMv7 CPU, no hardware crypto extensions) and shouldn't be extrapolated to other IoT devices without repeating the tests.
-- PowerJoular estimates energy consumption in software (from system counters); it does not replace direct hardware measurement (e.g. multimeter/INA219), which is a known limitation of this approach.
-- "Security" for each algorithm is assessed qualitatively (security level reported in the literature/NIST), not through original cryptanalysis.
+The last group is not homogeneous. AES, RSA, Triple DES, and Blowfish are cryptographic algorithms, while Caesar, Vigenère, Playfair, Rail Fence, and XOR are educational or historical examples. **Base64 is an encoding scheme, not encryption**, and is included only as a performance/reference baseline.
 
-## Evaluation Criteria
+## Repository structure
 
-| Criterion | How it's measured |
-|---|---|
-| **Performance** | Execution time per operation (encrypt/decrypt), per input size |
-| **Energy consumption** | [PowerJoular](https://github.com/joular/powerjoular) — total power, CPU power, and GPU power |
-| **Security level** | Based on literature and NIST classifications (not empirically tested) |
-
-> These three criteria — together with memory footprint — are the axes of a **multi-objective optimization** problem: there is no single "best algorithm" in absolute terms, only the one best suited given the weight assigned to each criterion for a given device and use case.
-
-## Algorithms Evaluated
-
-### Lightweight Cryptography (LWC) — NIST LWC finalists/participants
-- **ASCON**
-- **Elephant**
-- **GIFT-COFB**
-- **ISAP**
-- **TinyJAMBU**
-- **Xoodyak**
-
-### Traditional Cryptography
-- **AES**
-- **RSA**
-- **Triple DES**
-- **Blowfish**
-- Classic/reference ciphers: **Caesar**, **Vigenère**, **Playfair**, **Rail Fence**, **XOR**, **Base64** (used as a lower-bound reference for security/performance)
-
-## Repository Structure
-
-```
+```text
 Green-Security-for-IoT/
 ├── cripto_ciphers/
-│   ├── ciphers/            # C implementations of the traditional algorithms
-│   └── lwc_ciphers/        # C implementations of the lightweight (NIST LWC) algorithms
+│   ├── ciphers/                  Traditional and reference C implementations
+│   └── lwc_ciphers/              Lightweight cryptography implementations
 │       ├── ascon/
 │       ├── elephant/
 │       ├── gift/
 │       ├── isap/
 │       ├── tinyjambu/
 │       ├── xoodyak/
-│       └── utils/          # Shared helpers (e.g. hex conversion)
+│       └── utils/                Shared helpers
 ├── scripts/
-│   ├── makefile               # Builds all algorithms (traditional + LWC)
-│   ├── benchmark_algorithms/  # Benchmark scripts for the traditional algorithms (currently broken, see Known Issues)
-│   ├── lwc_algorithms/        # Benchmark scripts for the lightweight algorithms
-│   ├── runAll_lwc.sh          # Runs all LWC benchmarks in sequence
-│   └── idle_sys_10s.sh        # Records the system's idle power consumption (baseline)
-├── inputs/                  # Test input files (1–10 kB)
-├── results/                  # PowerJoular .csv results per algorithm/input size
-├── compilation_error_logs/   # Per-algorithm compilation error logs
+│   ├── makefile                  Builds the traditional and LWC binaries
+│   ├── benchmark_algorithms/     Traditional/reference benchmark scripts
+│   ├── lwc_algorithms/           LWC benchmark scripts
+│   ├── runAll_lwc.sh             Runs all LWC benchmark scripts
+│   └── idle_sys_10s.sh           Collects an idle-system baseline
+├── bin/
+│   ├── classic_ciphers/          Generated traditional/reference binaries
+│   └── lwc_ciphers/              Generated LWC binaries
+├── inputs/                       Benchmark input files from 1 kB to 10 kB
+├── results/                      PowerJoular CSV output and baseline data
+├── compilation_error_logs/       Compiler output for each algorithm group
 └── README.md
 ```
 
-## How to Run
+## Measurement methodology
 
-> Tested on a Raspberry Pi 2 Model B v1.1, with [PowerJoular](https://github.com/joular/powerjoular) installed and the repository cloned into `~/cripto_benchmark_pipeline` (path used internally by the scripts).
+The benchmark inputs currently include:
 
-1. **Build all algorithms**
+- `1 kB`;
+- `2 kB`;
+- `4 kB`;
+- `8 kB`;
+- `10 kB`.
 
-   ```bash
-   cd scripts
-   make -f makefile
-   ```
+For the LWC implementations, encryption and decryption are measured separately. The LWC C programs repeat the cryptographic operation internally so that a very short operation produces a measurable workload. The LWC scripts associate PowerJoular with the algorithm process, and run it with the `-c` flag, using:
 
-   Binaries are generated under `bin/classic_ciphers` and `bin/lwc_ciphers`, and any compilation errors are logged under `compilation_error_logs/`.
+```bash
+powerjoular -c -p <PID>
+```
 
-2. **Record the system's idle power consumption (baseline)**
+The `-c` flag drops PowerJoular's per-sample millisecond resolution, so the CSV output is logged at one-second granularity instead. This keeps the result files smaller and easier to aggregate, at the cost of sub-second detail within a single second of measurement.
 
-   ```bash
-   ./scripts/idle_sys_10s.sh
-   ```
+The traditional/reference scripts currently use a different execution model: their repetition loop is implemented in shell and invokes the binary repeatedly. This introduces process-startup and shell overhead and means that the existing traditional results are **not directly comparable** with the LWC results.
 
-3. **Run the lightweight (LWC) benchmarks**
+An idle baseline is also collected with `scripts/idle_sys_10s.sh` to provide a reference for the system's background power consumption.
 
-   ```bash
-   ./scripts/runAll_lwc.sh
-   ```
+PowerJoular CSV files contain the following fields:
 
-4. **Run the traditional-cipher benchmarks**
+```text
+Date, CPU Utilization, Total Power, CPU Power, GPU Power
+```
 
-   Each algorithm has its own script under `scripts/benchmark_algorithms/`, e.g.:
+PowerJoular provides software-based power estimates. It does not replace direct hardware measurements using equipment such as a multimeter or an INA219 sensor.
 
-   ```bash
-   ./scripts/benchmark_algorithms/AES_algorithm_test.sh
-   ```
+## Current limitations
 
-   ⚠️ **These scripts currently need to be fixed** (see "Known Issues" above) before their output can be trusted — they don't attach PowerJoular to the cipher's own process, and their iteration count (1,000, done in the shell) doesn't match the LWC benchmarks (10,000, done in C).
+The following limitations are important when interpreting the current results:
 
-Results for each run are saved under `results/<algorithm>_results/`, as `.csv` files, one per combination of operation (encrypt/decrypt) and input size.
+1. **Traditional and LWC benchmarks do not yet use the same execution model.** The iteration count, process lifetime, and PowerJoular attachment method differ.
 
-## Future Work
+2. **Traditional benchmark results must be recollected** after the benchmark scripts are aligned with the LWC methodology.
 
-- Fix the traditional-cipher benchmark scripts (per-process PowerJoular measurement, matching iteration count) and re-collect their data.
-- Test with a wider range of input sizes and input types.
-- Repeat the methodology on other IoT devices (Arduino, smartwatches, low-end smartphones) to validate how well the results generalize.
-- Combine performance, energy, security, and memory into a formal multi-objective analysis (e.g. a Pareto front) to support automatic algorithm selection for a given device/use case.
-- Hardware-based energy measurement, to complement/validate PowerJoular's software estimates.
+3. **The current CSV files contain power and utilization samples, not a complete statistical report.** Throughput, integrated energy per operation, confidence intervals, and memory usage are not currently generated automatically.
 
-## Base Repositories & References
+4. **The explicit `-O2` flag was removed from `scripts/makefile`.** The previous optimization setting was considered unsafe for the current benchmark design because the repeated cryptographic output was discarded, potentially allowing the compiler to remove or simplify part of the measured workload. Benchmarks should therefore be rebuilt without optimization until the measurement loop and output handling are fully validated.
 
-This project was based on the following repositories:
+5. **The benchmark scripts do not compile the algorithms themselves.** Compilation is handled by `scripts/makefile` and the algorithm-specific Makefiles under `cripto_ciphers`.
+
+6. **The current build system uses absolute paths based on `$HOME`.** The repository is expected to be available at `~/cripto_benchmark_pipeline`. Cloning it elsewhere requires updating the Makefiles and benchmark scripts.
+
+7. **Results are platform-specific.** CPU frequency, temperature, operating-system activity, power governor, compiler version, and PowerJoular version can all affect measurements.
+
+8. **Security is not empirically evaluated here.** Security classifications must be obtained from the relevant standards and technical literature; benchmark performance must not be interpreted as cryptographic strength.
+
+9. **The idle baseline is approximate.** The `idle_sys_10s.sh` script records an approximately 10-second system baseline, but the exact duration and system conditions should be documented with each experiment.
+
+## Requirements
+
+The project was developed for a Linux-based Raspberry Pi environment and requires:
+
+- GCC;
+- GNU Make;
+- Bash;
+- PowerJoular;
+- OpenSSL development libraries for AES;
+- the standard math library for RSA;
+- the libraries available on the target system for the selected algorithms.
+
+The current Makefiles use paths based on the environment variable `HOME` and expect the project to be available at:
+
+```text
+~/cripto_benchmark_pipeline
+```
+
+If the repository is cloned elsewhere, update the paths in `scripts/makefile` and the benchmark scripts before running them.
+
+## Build
+
+From the repository root:
+
+```bash
+cd scripts
+make -f makefile
+```
+
+The build writes binaries to:
+
+```text
+bin/classic_ciphers
+bin/lwc_ciphers
+```
+
+Compiler output is redirected to:
+
+```text
+compilation_error_logs/
+```
+
+To remove generated binaries and compilation logs:
+
+```bash
+cd scripts
+make -f makefile clean
+```
+
+## Run the benchmarks
+
+### 1. Collect an idle baseline
+
+From the repository root:
+
+```bash
+./scripts/idle_sys_10s.sh
+```
+
+### 2. Run all LWC benchmarks
+
+```bash
+./scripts/runAll_lwc.sh
+```
+
+The LWC results are written to directories such as:
+
+```text
+results/ascon_results/
+results/elephant_results/
+results/gift_results/
+results/isap_results/
+results/tinyjambu_results/
+results/xoodyak_results/
+```
+
+### 3. Run an individual traditional/reference benchmark
+
+For example:
+
+```bash
+./scripts/benchmark_algorithms/AES_algorithm_test.sh
+```
+
+Other benchmark scripts are available in:
+
+```text
+scripts/benchmark_algorithms/
+```
+
+> **Warning:** The traditional/reference benchmark scripts currently measure a different workload from the LWC scripts. Do not use their existing output to claim a fair cross-family ranking until the measurement protocol has been aligned.
+
+## Interpreting the results
+
+The result files are raw PowerJoular samples. Before making comparisons, the analysis should account for:
+
+- idle power;
+- benchmark duration;
+- number of cryptographic operations;
+- input size;
+- encryption versus decryption;
+- process and shell overhead;
+- compiler and system configuration;
+- repeated runs and statistical variation.
+
+A meaningful future comparison should report at least:
+
+- execution time per operation;
+- throughput in bytes per second;
+- estimated energy per operation or per byte;
+- CPU utilization;
+- peak or average memory usage;
+- mean, standard deviation, and number of repetitions.
+
+## Research goals and future work
+
+Planned improvements include:
+
+- moving all repetition loops into the measured programs or using one shared runner;
+- using the same iteration count for traditional and LWC algorithms;
+- measuring the algorithm process consistently for every benchmark;
+- removing hard-coded repository paths;
+- recording compiler, operating-system, CPU, temperature, and PowerJoular metadata;
+- adding automated encrypt/decrypt round-trip tests;
+- measuring execution time, memory usage, throughput, and integrated energy;
+- repeating the experiments on additional IoT platforms;
+- validating software power estimates with hardware-based measurements;
+- producing a multi-objective analysis involving security, performance, energy, and memory.
+
+## References
+
+This project builds on or refers to the following resources:
 
 - [The-Cryptography/C](https://github.com/The-Cryptography/C)
-- [cepdnaclk/e16-4yp-implementation-of-lightweight-cryptographic-algorithms](https://github.com/cepdnaclk/e16-4yp-implementation-of-lightweight-cryptographic-algorithms)
+- [Implementation of Lightweight Cryptographic Algorithms](https://github.com/cepdnaclk/e16-4yp-implementation-of-lightweight-cryptographic-algorithms)
+- [NIST Lightweight Cryptography Project](https://csrc.nist.gov/projects/lightweight-cryptography)
+- [NIST IR 8454](https://nvlpubs.nist.gov/nistpubs/ir/2023/NIST.IR.8454.pdf)
+- [PowerJoular](https://github.com/joular/powerjoular)
 
-And the following reference documentation:
+## Disclaimer
 
-- [NIST — Lightweight Cryptography Project](https://csrc.nist.gov/projects/lightweight-cryptography)
-- [NIST IR 8454 — Status Report on the Final Round of the NIST Lightweight Cryptography Standardization Process](https://nvlpubs.nist.gov/nistpubs/ir/2023/NIST.IR.8454.pdf)
-- [SPDX — Cryptographic Algorithm List (issue #11)](https://github.com/spdx/cryptographic-algorithm-list/issues/11)
-- [ScienceDirect — S1574119223001050](https://www.sciencedirect.com/science/article/abs/pii/S1574119223001050)
-
-## Tools
-
-- [PowerJoular](https://github.com/joular/powerjoular) — software-based energy measurement, used across all runs (with the `-c` flag).
+This is an experimental and educational benchmarking project. The implementations and measurements should not be used as a substitute for production cryptographic libraries, formal security analysis, or hardware-validated energy measurements.
