@@ -215,7 +215,32 @@ results/tinyjambu_results/
 results/xoodyak_results/
 ```
 
-### 3. Run an individual traditional/reference benchmark
+### 3. Run all traditional/reference benchmarks
+
+```bash
+./scripts/runAll_classic.sh
+```
+
+The traditional/reference results are written to directories such as:
+
+```text
+results/AES_results/
+results/RSA_results/
+results/TripleDES_results/
+results/Blowfish_results/
+results/base64_results/
+results/caeser_results/
+results/playfair_results/
+results/railfence_results/
+results/vigenere_results/
+results/xor_results/
+```
+
+Each classic benchmark now follows the LWC process model: encryption and
+decryption are measured separately, PowerJoular is attached to the operation
+process, and each input size produces one CSV file.
+
+### 4. Run an individual traditional/reference benchmark
 
 For example:
 

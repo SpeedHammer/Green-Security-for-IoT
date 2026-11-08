@@ -1,17 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-cd ~/cripto_benchmark_pipeline/bin
-
-powerjoular -f ~/cripto_benchmark_pipeline/results/caeser_cipher_encrypt_result.txt & PID=$!
-
-sleep 1
-
-for i in $(seq 1 1000);
-do
-       echo 1 | ./caeser_cipher
-done
-
-kill -INT $PID
-wait $PID
-
+exec "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)/benchmark_classic.sh" \
+    caeser_cipher caeser encrypt
 
