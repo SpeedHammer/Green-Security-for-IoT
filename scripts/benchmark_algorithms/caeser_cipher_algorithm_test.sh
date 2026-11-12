@@ -13,8 +13,8 @@ rm -f "$OUTPUT"/*
 for type in "${RUN[@]}"; do        
         for file in "${INPUTS[@]}"; do
         
-                bash -c 'kill -STOP $$; exec ~/cripto_benchmark_pipeline/bin/classic_ciphers/caeser_cipher_''"$type"' \
-                < ~/cripto_benchmark_pipeline/inputs/''"$file"' \
+                bash -c 'kill -STOP $$; exec ~/cripto_benchmark_pipeline/bin/classic_ciphers/caeser_cipher_'"$type"' \
+                < ~/cripto_benchmark_pipeline/inputs/'"$file"' \
                 > /dev/null' & P_PID=$!
                 
                 powerjoular -c -p "$P_PID" -f  "$OUTPUT"/caeser_"$type"_$(basename "$file" .txt).csv & PID=$!
