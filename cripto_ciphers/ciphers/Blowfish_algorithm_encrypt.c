@@ -300,16 +300,27 @@ int main(void)
     }
     memcpy(buf, message, msglen);
 
+    BYTE *ciphertext = calloc(padded_len, 1);
+    if (!ciphertext) {
+        fprintf(stderr, "Allocation failed.\n");
+        free(message); free(buf);
+        return 1;
+    }
+
+    for (int repeat = 0; repeat < 10000; repeat++) {
+        for (size_t i = 0; i < padded_len; i += 8) {
+            BYTE out[8];
+            blowfish_encrypt(buf + i, out, &bfkey);
+            memcpy(ciphertext + i, out, 8);
+        }
+    }
+
     printf("Cipher text (hex): ");
     for (size_t i = 0; i < padded_len; i += 8) {
-        BYTE out[8];
-        blowfish_encrypt(buf + i, out, &bfkey);
-        memcpy(buf + i, out, 8);
-        for (int j = 0; j < 8; j++) printf("%02X", out[j]);
+        for (int j = 0; j < 8; j++) printf("%02X", ciphertext[i + j]);
     }
     printf("\n");
 
-    free(message);
-    free(buf);
+    free(message); free(buf); free(ciphertext);
     return 0;
 }

@@ -35,7 +35,8 @@ int main(void){
         return 1;
     }
 
-    railfence_encipher(RAILS, plaintext, ciphertext);
+    for (int i = 0; i < 10000; i++)
+        railfence_encipher(RAILS, plaintext, ciphertext);
 
     printf("Cipher text: %s\n", ciphertext);
 

@@ -101,12 +101,18 @@ int main(void)
 
 	/* --- operacao medida --- */
 	size_t decoded_len = 0;
-	unsigned char *decoded = base64Decoder(encoded, &decoded_len);
-
-	if (!decoded) {
-		fprintf(stderr, "Decode failed (allocation or malformed base64).\n");
-		free(line); free(encoded);
-		return 1;
+	unsigned char *decoded = NULL;
+	for (int i = 0; i < 10000; i++) {
+		size_t next_len = 0;
+		unsigned char *next = base64Decoder(encoded, &next_len);
+		if (!next) {
+			fprintf(stderr, "Decode failed (allocation or malformed base64).\n");
+			free(line); free(encoded); free(decoded);
+			return 1;
+		}
+		free(decoded);
+		decoded = next;
+		decoded_len = next_len;
 	}
 
 	printf("Deciphered text: %s\n", decoded);

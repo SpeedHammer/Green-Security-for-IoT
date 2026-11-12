@@ -52,7 +52,10 @@ int main(void)
 	recovered[nread] = '\0';
 
 	/* --- operacao medida --- */
-	encryptDecrypt(recovered, (size_t)nread);
+	for (int i = 0; i < 10000; i++) {
+		memcpy(recovered, ciphertext, (size_t)nread);
+		encryptDecrypt(recovered, (size_t)nread);
+	}
 
 	printf("Deciphered text: %s\n", recovered);
 

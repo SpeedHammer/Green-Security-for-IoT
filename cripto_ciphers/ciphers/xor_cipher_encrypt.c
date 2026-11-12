@@ -43,10 +43,10 @@ int main(void)
 		free(line);
 		return 1;
 	}
-	memcpy(ciphertext, line, (size_t)nread);
-	ciphertext[nread] = '\0';
-
-	encryptDecrypt(ciphertext, (size_t)nread);
+	for (int i = 0; i < 10000; i++) {
+		memcpy(ciphertext, line, (size_t)nread);
+		encryptDecrypt(ciphertext, (size_t)nread);
+	}
 
 	/* saida em hex: o ciphertext XOR contem bytes nao-imprimiveis que
 	   quebrariam o terminal se impressos como texto */

@@ -320,15 +320,17 @@ int main(void) {
         return 1;
     }
 
-    for (int b = 0; b < padded_len; b += 8) {
-        uint64_t block = 0;
-        for (int i = 0; i < 8; i++) block = (block << 8) | buf[b + i];
+    for (int repeat = 0; repeat < 10000; repeat++) {
+        for (int b = 0; b < padded_len; b += 8) {
+            uint64_t block = 0;
+            for (int i = 0; i < 8; i++) block = (block << 8) | buf[b + i];
 
-        uint64_t result = des(block, key[0], 'e');
-        result = des(result, key[1], 'd');
-        result = des(result, key[2], 'e');
+            uint64_t result = des(block, key[0], 'e');
+            result = des(result, key[1], 'd');
+            result = des(result, key[2], 'e');
 
-        cipher_blocks[b / 8] = result;
+            cipher_blocks[b / 8] = result;
+        }
     }
 
     printf("Cipher text (hex): ");

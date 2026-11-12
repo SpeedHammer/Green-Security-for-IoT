@@ -47,7 +47,7 @@ int main(void) {
 	t=(p-1)*(q-1);
 	ce();
 	
-for(int i = 1; i < 10000; i++){
+for(int i = 0; i < 10000; i++){
 		encrypt();
 	};
 	

@@ -341,15 +341,18 @@ int main(void) {
 
     /* --- operacao medida --- */
     int dpos = 0;
-    for (int b = 0; b < padded_len; b += 8) {
-        uint64_t result = cipher_blocks[b / 8];
-        result = des(result, key[2], 'd');
-        result = des(result, key[1], 'e');
-        result = des(result, key[0], 'd');
+    for (int repeat = 0; repeat < 10000; repeat++) {
+        dpos = 0;
+        for (int b = 0; b < padded_len; b += 8) {
+            uint64_t result = cipher_blocks[b / 8];
+            result = des(result, key[2], 'd');
+            result = des(result, key[1], 'e');
+            result = des(result, key[0], 'd');
 
-        for (int i = 7; i >= 0; i--) {
-            unsigned char c = (result >> (i * 8)) & 0xFF;
-            if (c) decrypted[dpos++] = c;
+            for (int i = 7; i >= 0; i--) {
+                unsigned char c = (result >> (i * 8)) & 0xFF;
+                if (c) decrypted[dpos++] = c;
+            }
         }
     }
     decrypted[dpos] = '\0';

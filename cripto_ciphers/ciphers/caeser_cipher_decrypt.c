@@ -55,7 +55,10 @@ int main(void)
 	}
 
 	/* --- operacao medida --- */
-	caesarShift(recovered, -KEY);
+	for (int i = 0; i < 10000; i++) {
+		memcpy(recovered, ciphertext, (size_t)nread + 1);
+		caesarShift(recovered, -KEY);
+	}
 
 	printf("Deciphered text: %s\n", recovered);
 

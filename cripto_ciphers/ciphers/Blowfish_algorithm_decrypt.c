@@ -316,10 +316,13 @@ int main(void)
 
     /* --- operacao medida --- */
     size_t dpos = 0;
-    for (size_t i = 0; i < padded_len; i += 8) {
-        BYTE out[8];
-        blowfish_decrypt(buf + i, out, &bfkey);
-        for (int j = 0; j < 8; j++) if (out[j]) decrypted[dpos++] = out[j];
+    for (int repeat = 0; repeat < 10000; repeat++) {
+        dpos = 0;
+        for (size_t i = 0; i < padded_len; i += 8) {
+            BYTE out[8];
+            blowfish_decrypt(buf + i, out, &bfkey);
+            for (int j = 0; j < 8; j++) if (out[j]) decrypted[dpos++] = out[j];
+        }
     }
     decrypted[dpos] = '\0';
 

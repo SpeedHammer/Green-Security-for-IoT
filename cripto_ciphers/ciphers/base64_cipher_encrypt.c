@@ -59,11 +59,17 @@ int main(void)
 	}
 	if (nread > 0 && line[nread - 1] == '\n') { line[nread - 1] = '\0'; nread--; }
 
-	char *encoded = base64Encoder((unsigned char *)line, (size_t)nread);
-	if (!encoded) {
-		fprintf(stderr, "Encode allocation failed.\n");
-		free(line);
-		return 1;
+	char *encoded = NULL;
+	for (int i = 0; i < 10000; i++) {
+		char *next = base64Encoder((unsigned char *)line, (size_t)nread);
+		if (!next) {
+			fprintf(stderr, "Encode allocation failed.\n");
+			free(line);
+			free(encoded);
+			return 1;
+		}
+		free(encoded);
+		encoded = next;
 	}
 
 	printf("Cipher text: %s\n", encoded);

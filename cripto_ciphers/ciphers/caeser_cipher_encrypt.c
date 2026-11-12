@@ -48,7 +48,10 @@ int main(void)
 		return 1;
 	}
 
-	caesarShift(ciphertext, KEY);
+	for (int i = 0; i < 10000; i++) {
+		memcpy(ciphertext, line, (size_t)nread + 1);
+		caesarShift(ciphertext, KEY);
+	}
 
 	printf("Cipher text: %s\n", ciphertext);
 

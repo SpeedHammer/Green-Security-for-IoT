@@ -338,7 +338,17 @@ int main(void)
 	}
 
 	/* --- operacao medida --- */
-	decryptByPlayfairCipher(str, key2);
+	char *work = malloc(str_cap);
+	if (!work) {
+		fprintf(stderr, "Allocation failed.\n");
+		free(str); free(original);
+		return 1;
+	}
+	for (int i = 0; i < 10000; i++) {
+		memcpy(work, str, str_cap);
+		decryptByPlayfairCipher(work, key2);
+	}
+	memcpy(str, work, str_cap);
 
 	printf("Deciphered text: %s\n", str);
 
@@ -351,5 +361,6 @@ int main(void)
 
 	free(str);
 	free(original);
+	free(work);
 	return ok ? 0 : 1;
 }

@@ -48,7 +48,8 @@ int main(void) {
         return 1;
     }
 
-    vigenere_encrypt(message, key, encrypted);
+    for (int i = 0; i < 10000; i++)
+        vigenere_encrypt(message, key, encrypted);
 
     printf("Cipher text: %s\n", encrypted);
 

@@ -282,14 +282,26 @@ int main(void)
 	}
 	str = grown;
 
-	if (encryptByPlayfairCipher(str, str_cap, key) < 0) {
-		fprintf(stderr, "Encryption buffer too small.\n");
+	char *work = malloc(str_cap);
+	if (!work) {
+		fprintf(stderr, "Allocation failed.\n");
 		free(str);
 		return 1;
 	}
 
+	for (int i = 0; i < 10000; i++) {
+		memcpy(work, str, str_cap);
+		if (encryptByPlayfairCipher(work, str_cap, key) < 0) {
+			fprintf(stderr, "Encryption buffer too small.\n");
+			free(str); free(work);
+			return 1;
+		}
+	}
+	memcpy(str, work, str_cap);
+
 	printf("Cipher text: %s\n", str);
 
+	free(work);
 	free(str);
 	return 0;
 }

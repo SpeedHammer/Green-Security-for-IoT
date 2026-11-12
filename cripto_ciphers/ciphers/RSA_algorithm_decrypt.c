@@ -50,11 +50,15 @@ int main(void) {
 	encrypt();
 
 	/* --- operacao medida --- */
-	for(int i = 1; i < 10000; i++){
-		decrypt();
+	int ok = 0;
+	for(int i = 0; i < 10000; i++){
+		ok = decrypt();
 	};
-	
-	int ok = decrypt();
+
+	printf("Deciphered text: ");
+	for (i = 0; m[i] != -1; i++)
+		printf("%c", (int)m[i]);
+	printf("\n");
 	printf("Verification: %s\n", ok ? "OK" : "FAILED");
 	return ok ? 0 : 1;
 }
@@ -130,11 +134,6 @@ int decrypt() {
 	}
 	long int dlen = i;
 	m[i]=-1;
-	printf("Deciphered text: ");
-	for (i=0;m[i]!=-1;i++)
-	printf("%c",m[i]);
-	printf("\n");
-
 	// FIX: added automatic round-trip verification - the decrypted
 	// characters in m[] are compared against the pristine copy of the
 	// input saved before encryption.

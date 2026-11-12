@@ -39,7 +39,8 @@ int main(void){
     railfence_encipher(RAILS, plaintext, ciphertext);
 
     /* --- operacao medida --- */
-    railfence_decipher(RAILS, ciphertext, result);
+    for (int i = 0; i < 10000; i++)
+        railfence_decipher(RAILS, ciphertext, result);
 
     printf("Deciphered text: %s\n", result);
     printf("Verification: %s\n", strcmp(plaintext, result) == 0 ? "OK" : "FAILED");

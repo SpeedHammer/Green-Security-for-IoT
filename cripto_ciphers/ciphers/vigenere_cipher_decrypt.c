@@ -68,7 +68,8 @@ int main(void) {
     vigenere_encrypt(message, key, encrypted);
 
     /* --- operacao medida --- */
-    vigenere_decrypt(encrypted, key, decrypted);
+    for (int i = 0; i < 10000; i++)
+        vigenere_decrypt(encrypted, key, decrypted);
 
     printf("Deciphered text: %s\n", decrypted);
 
