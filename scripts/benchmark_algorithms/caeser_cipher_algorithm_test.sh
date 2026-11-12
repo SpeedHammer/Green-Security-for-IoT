@@ -14,11 +14,11 @@ rm -f "$OUTPUT"/*
 for type in "${RUN[@]}"; do
         for file in "${INPUTS[@]}"; do
 
-                bash -c 'kill -STOP $$; exec "$1" < "$2" > /dev/null' \\
-                bash "$ROOT/bin/classic_ciphers/caeser_cipher_$type" \\
+                bash -c 'kill -STOP $$; exec "$1" < "$2" > /dev/null' \
+                bash "$ROOT/bin/classic_ciphers/caeser_cipher_$type" \
                 "$ROOT/inputs/$file" & P_PID=$!
 
-                powerjoular -c -p "$P_PID" -f \\
+                powerjoular -c -p "$P_PID" -f \
                 "$OUTPUT"/caeser_cipher_"$type"_$(basename "$file" .txt).csv & PID=$!
                 sleep 1
 
