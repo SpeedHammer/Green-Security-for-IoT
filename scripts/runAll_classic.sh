@@ -10,7 +10,6 @@ SCRIPTS=(
     Blowfish_algorithm_test.sh
     base64_cipher_algorithm_test.sh
     caeser_cipher_algorithm_encrypt_test.sh
-    caeser_cipher_algorithm_decrypt_test.sh
     playfair_cipher_algorithm_test.sh
     railfence_cipher_test.sh
     vigenere_cipher_algorithm_test.sh

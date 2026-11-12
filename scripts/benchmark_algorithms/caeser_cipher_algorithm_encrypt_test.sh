@@ -3,7 +3,7 @@
 INPUTS=("input_1kB.txt" "input_2kB.txt" "input_4kB.txt" \
 "input_8kB.txt" "input_10kB.txt")
 
-RUN=("encrypt")
+RUN=("encrypt" "decrypt")
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUTPUT="$ROOT/results/caeser_results"
